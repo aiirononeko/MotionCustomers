@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:in_app_purchase/in_app_purchase.dart';
+
+import '../../service/payment.dart';
 
 class SubscriptionPaymentScreen extends StatefulWidget {
   const SubscriptionPaymentScreen({Key? key}) : super(key: key);
@@ -10,6 +13,14 @@ class SubscriptionPaymentScreen extends StatefulWidget {
 }
 
 class _SubscriptionPaymentScreen extends State<SubscriptionPaymentScreen> {
+
+  ProductDetails? _product;
+
+  @override
+  void initState() {
+    super.initState();
+    getStoreInfo();
+  }
 
   final url = "https://riverbed-coffee-customer-dev.firebaseapp.com/";
   bool _flag = false;
@@ -64,7 +75,7 @@ class _SubscriptionPaymentScreen extends State<SubscriptionPaymentScreen> {
             Container(
               padding: EdgeInsets.fromLTRB(0, height * 0.025, 0, 0),
               child: Text(
-                "月額2,980円でリバーベットコーヒーのコーヒーが飲み放題のサブスクリプション型コーヒーサービス。",
+                "月額${_product?.price}円でリバーベットコーヒーのコーヒーが飲み放題のサブスクリプション型コーヒーサービス。",
                 style: TextStyle(
                   fontWeight: FontWeight.bold,
                   fontSize: height * 0.015,
@@ -217,5 +228,13 @@ class _SubscriptionPaymentScreen extends State<SubscriptionPaymentScreen> {
         ),
       ),
     );
+  }
+
+  Future<void> getStoreInfo() async {
+    Payment payment = Payment();
+    ProductDetails? product = await payment.getStoreInfo();
+    setState(() {
+      _product = product;
+    });
   }
 }
