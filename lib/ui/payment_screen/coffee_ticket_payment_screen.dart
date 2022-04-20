@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:in_app_purchase/in_app_purchase.dart';
 import 'package:url_launcher/url_launcher.dart';
+
+import '../../service/payment.dart';
 
 class CoffeeTicketPaymentScreen extends StatefulWidget {
   const CoffeeTicketPaymentScreen({Key? key}) : super(key: key);
@@ -11,8 +14,24 @@ class CoffeeTicketPaymentScreen extends StatefulWidget {
 
 class _CoffeeTicketPaymentScreen extends State<CoffeeTicketPaymentScreen> {
 
+  ProductDetails? _product;
+
   final url = "https://riverbed-coffee-customer-dev.firebaseapp.com/";
   bool _flag = false;
+
+  @override
+  void initState() {
+    super.initState();
+    getStoreInfo();
+  }
+
+  Future<void> getStoreInfo() async {
+    Payment payment = Payment();
+    ProductDetails? product = await payment.getCoffeeTicketItemInfo();
+    setState(() {
+      _product = product;
+    });
+  }
 
   void _handleCheckbox(bool? e) {
     if (e != null) {
@@ -43,13 +62,11 @@ class _CoffeeTicketPaymentScreen extends State<CoffeeTicketPaymentScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Container(
-              child: IconButton(
-                onPressed: () {
-                  Navigator.pop(context);
-                },
-                icon: const Icon(Icons.arrow_back),
-              ),
+            IconButton(
+              onPressed: () {
+                Navigator.pop(context);
+              },
+              icon: const Icon(Icons.arrow_back),
             ),
             Container(
               padding: EdgeInsets.fromLTRB(0, height * 0.01, 0, 0),
@@ -64,7 +81,7 @@ class _CoffeeTicketPaymentScreen extends State<CoffeeTicketPaymentScreen> {
             Container(
               padding: EdgeInsets.fromLTRB(0, height * 0.025, 0, 0),
               child: Text(
-                "5000円で11杯分のスペシャルティコーヒーが飲めるコーヒーチケット。",
+                "\$${_product?.rawPrice}で11杯分のスペシャルティコーヒーが飲めるコーヒーチケット。",
                 style: TextStyle(
                   fontWeight: FontWeight.bold,
                   fontSize: height * 0.015,

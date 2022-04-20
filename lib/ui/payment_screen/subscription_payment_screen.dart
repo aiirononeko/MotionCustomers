@@ -16,14 +16,22 @@ class _SubscriptionPaymentScreen extends State<SubscriptionPaymentScreen> {
 
   ProductDetails? _product;
 
+  final url = "https://riverbed-coffee-customer-dev.firebaseapp.com/";
+  bool _flag = false;
+
   @override
   void initState() {
     super.initState();
     getStoreInfo();
   }
 
-  final url = "https://riverbed-coffee-customer-dev.firebaseapp.com/";
-  bool _flag = false;
+  Future<void> getStoreInfo() async {
+    Payment payment = Payment();
+    ProductDetails? product = await payment.getSubscriptionItemInfo();
+    setState(() {
+      _product = product;
+    });
+  }
 
   void _handleCheckbox(bool? e) {
     if (e != null) {
@@ -59,7 +67,7 @@ class _SubscriptionPaymentScreen extends State<SubscriptionPaymentScreen> {
                 onPressed: () {
                   Navigator.pop(context);
                 },
-                icon: Icon(Icons.arrow_back),
+                icon: const Icon(Icons.arrow_back),
               ),
             ),
             Container(
@@ -75,7 +83,7 @@ class _SubscriptionPaymentScreen extends State<SubscriptionPaymentScreen> {
             Container(
               padding: EdgeInsets.fromLTRB(0, height * 0.025, 0, 0),
               child: Text(
-                "月額${_product?.price}円でリバーベットコーヒーのコーヒーが飲み放題のサブスクリプション型コーヒーサービス。",
+                "月額\$${_product?.rawPrice}でリバーベットコーヒーのコーヒーが飲み放題のサブスクリプション型コーヒーサービス。",
                 style: TextStyle(
                   fontWeight: FontWeight.bold,
                   fontSize: height * 0.015,
@@ -228,13 +236,5 @@ class _SubscriptionPaymentScreen extends State<SubscriptionPaymentScreen> {
         ),
       ),
     );
-  }
-
-  Future<void> getStoreInfo() async {
-    Payment payment = Payment();
-    ProductDetails? product = await payment.getStoreInfo();
-    setState(() {
-      _product = product;
-    });
   }
 }
