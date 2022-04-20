@@ -1,8 +1,30 @@
+import 'dart:async';
+
+import 'package:cloud_functions/cloud_functions.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:in_app_purchase/in_app_purchase.dart';
 
 class Payment {
+  Payment() : super() {
 
+    // 課金処理を監視する
+    Stream purchaseUpdated = _connection.purchaseStream;
+
+    _subscription = purchaseUpdated.listen((purchaseDetailsList) {
+      _listenToPurchaseUpdated(purchaseDetailsList);
+    }, onDone: () {
+      _subscription.cancel();
+    }, onError: (error) {
+    }) as StreamSubscription<List<PurchaseDetails>>;
+  }
+
+  late StreamSubscription<List<PurchaseDetails>> _subscription;
   final InAppPurchase _connection = InAppPurchase.instance;
+
+  /// ストア情報の初期化を行う
+  Future _initStoreStatus() async {
+    // 省略
+  }
 
   /// サブスクアイテムの取得を行う
   /// 課金ページを開いた時に実行する
@@ -71,4 +93,99 @@ class Payment {
 
     return null;
   }
+
+  /// 購入を実行する
+  Future<void> buySubscription(ProductDetails product) async {
+    try {
+      PurchaseParam purchaseParam = PurchaseParam(
+        productDetails: product,
+        applicationUserName: null,
+      );
+      await _connection.buyNonConsumable(purchaseParam: purchaseParam);
+    } catch (err) {
+      // TODO
+    }
+  }
+
+  /// CloudFunctions経由でレシート検証, 期限検証, (検証成功であれば)Firestoreへレシート登録を行う
+  Future<int> _verifyPurchase(String data) async {
+
+    // uid取得
+    String? uid = FirebaseAuth.instance.currentUser?.uid;
+
+    try {
+      HttpsCallable verifyReceipt =
+      FirebaseFunctions.instanceFor(region: 'asia-northeast1').httpsCallable('VerifyReceipt');
+      final HttpsCallableResult result = await verifyReceipt.call(
+          {
+            'uid': uid,
+            'data': data
+          }
+      );
+
+      print("Verify Purchase RESULT: " + result.data.toString());
+      return result.data[PaymentConst.result];
+    } catch (_) {
+      return PaymentConst.UNEXPECTED_ERROR;
+    }
+  }
+
+  /// 購入処理のリスナー
+  void _listenToPurchaseUpdated(List<PurchaseDetails> purchaseDetailsList) async {
+
+    if (purchaseDetailsList.isEmpty) {
+      return;
+    }
+
+    purchaseDetailsList.forEach((PurchaseDetails purchaseDetails) async {
+
+      // PurchaseStatus.pending
+      if (purchaseDetails.status == PurchaseStatus.pending) {
+        showPendingUI(true);
+      } else {
+
+        // PurchaseStatus.error
+        if (purchaseDetails.status == PurchaseStatus.error) {
+          // TODO
+        }
+
+        // PurchaseStatus.purchased
+        else if (purchaseDetails.status == PurchaseStatus.purchased) {
+          final result = await _verifyPurchase(purchaseDetails.verificationData.serverVerificationData);
+          if (result == PaymentConst.SUCCESS) {
+            // TODO
+          }
+        }
+
+        // PurchaseStatus.restored
+        else if (purchaseDetails.status == PurchaseStatus.restored) {
+          final result = await _verifyPurchase(purchaseDetails.verificationData.serverVerificationData);
+          if (result == PaymentConst.SUCCESS) {
+            // TODO
+          }
+        }
+
+        if (purchaseDetails.pendingCompletePurchase) {
+          await _connection.completePurchase(purchaseDetails);
+        }
+        showPendingUI(false);
+      }
+    });
+  }
+
+  /// 画面をロックする
+  void showPendingUI(bool pending) {
+    // TODO
+  }
+}
+
+class PaymentConst {
+  static const String result = 'result';
+  static const SUCCESS = 0; // 成功 (期限内)
+  static const EXPIRED = 1; // 期限切れ
+  static const DOCUMENT_NOT_FOUND = 2; // Firestoreにドキュメントなし
+  static const NO_AUTH = 3; // 認証情報なし
+  static const INVALID_RECEIPT = 4; // レシート情報が不正です
+  static const ALREADY_EXIST = 5; // 同じトランザクションが存在している
+  static const UNEXPECTED_ERROR = 99; // 不明なエラー
 }
