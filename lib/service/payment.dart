@@ -131,23 +131,26 @@ class Payment {
     // uid取得
     String? uid = FirebaseAuth.instance.currentUser?.uid;
 
-    // try {
-    //   HttpsCallable verifyReceipt =
-    //       FirebaseFunctions.instanceFor(region: 'asia-northeast1').httpsCallable('VerifyReceipt');
-    //   final HttpsCallableResult result = await verifyReceipt.call(
-    //       {
-    //         'uid': uid,
-    //         'data': data
-    //       }
-    //   );
-    //
-    //   print("Verify Purchase RESULT: " + result.data.toString());
-    //   return result.data[PaymentConst.result];
-    // } catch (_) {
-    //   return PaymentConst.UNEXPECTED_ERROR;
-    // }
+    try {
+      HttpsCallable verifyReceipt =
+          FirebaseFunctions.instanceFor(region: 'asia-northeast1').httpsCallable('VerifyReceipt');
+      final HttpsCallableResult result = await verifyReceipt.call(
+          {
+            'uid': uid,
+            'data': data
+          }
+      );
 
-    return PaymentConst.SUCCESS; // TODO クライアント側の動作確認のためスタブ化
+      print("Verify Purchase RESULT: " + result.data.toString());
+
+      if (result.data["code"] == 200) {
+        return PaymentConst.SUCCESS;
+      } else {
+        return PaymentConst.UNEXPECTED_ERROR;
+      }
+    } catch (_) {
+      return PaymentConst.UNEXPECTED_ERROR;
+    }
   }
 
   /// 購入処理のリスナー
@@ -174,7 +177,6 @@ class Payment {
         else if (purchaseDetails.status == PurchaseStatus.purchased) {
           final result = await _verifyPurchase(purchaseDetails.verificationData.serverVerificationData);
           if (result == PaymentConst.SUCCESS) {
-            // TODO
 
             // uid取得
             String? uid = FirebaseAuth.instance.currentUser?.uid;
@@ -195,7 +197,18 @@ class Payment {
         else if (purchaseDetails.status == PurchaseStatus.restored) {
           final result = await _verifyPurchase(purchaseDetails.verificationData.serverVerificationData);
           if (result == PaymentConst.SUCCESS) {
-            // TODO
+
+            // uid取得
+            String? uid = FirebaseAuth.instance.currentUser?.uid;
+            if (purchaseDetails.productID == "motion_coffee_ticket") {
+              Customers customer = await FirestoreCustomize.fetchCustomerInfo(uid!);
+              FirestoreCustomize.updateCoffeeTicketsAmount(uid!, int.parse(customer.coffeeTickets)); /// コーヒーチケット追加
+              print("add coffee tickets");
+            } else if (purchaseDetails.productID == "motion_subscription") {
+              FirestoreCustomize.updatePremiumAccount(uid!); /// サブスクリプション反映
+              print("changed user status");
+            }
+
             print("restored");
           }
         }

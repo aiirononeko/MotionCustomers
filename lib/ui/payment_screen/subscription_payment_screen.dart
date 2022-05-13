@@ -63,13 +63,11 @@ class _SubscriptionPaymentScreen extends State<SubscriptionPaymentScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Container(
-              child: IconButton(
-                onPressed: () {
-                  Navigator.pop(context);
-                },
-                icon: const Icon(Icons.arrow_back),
-              ),
+            IconButton(
+              onPressed: () {
+                Navigator.pop(context);
+              },
+              icon: const Icon(Icons.arrow_back),
             ),
             Container(
               padding: EdgeInsets.fromLTRB(0, height * 0.01, 0, 0),
