@@ -14,6 +14,8 @@ class SubscriptionPaymentScreen extends StatefulWidget {
 
 class _SubscriptionPaymentScreen extends State<SubscriptionPaymentScreen> {
 
+  final Payment _payment = Payment();
+
   ProductDetails? _product;
 
   final url = "https://riverbed-coffee-customer-dev.firebaseapp.com/";
@@ -26,8 +28,7 @@ class _SubscriptionPaymentScreen extends State<SubscriptionPaymentScreen> {
   }
 
   Future<void> getStoreInfo() async {
-    Payment payment = Payment();
-    ProductDetails? product = await payment.getSubscriptionItemInfo();
+    ProductDetails? product = await _payment.getSubscriptionItemInfo();
     setState(() {
       _product = product;
     });
@@ -219,7 +220,7 @@ class _SubscriptionPaymentScreen extends State<SubscriptionPaymentScreen> {
                     padding: EdgeInsets.fromLTRB(width * 0.15, height * 0.02, width * 0.15, height * 0.02)
                 ),
                 onPressed: !_flag? null: () {
-                  // TODO サブスクリプション購入処理
+                  _payment.buySubscription(_product!); /// サブスクリプション購入
                 },
                 child: Text(
                   "サブスクリプションに登録する",

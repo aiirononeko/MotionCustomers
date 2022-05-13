@@ -14,6 +14,8 @@ class CoffeeTicketPaymentScreen extends StatefulWidget {
 
 class _CoffeeTicketPaymentScreen extends State<CoffeeTicketPaymentScreen> {
 
+  final Payment _payment = Payment();
+
   ProductDetails? _product;
 
   final url = "https://riverbed-coffee-customer-dev.firebaseapp.com/";
@@ -26,8 +28,7 @@ class _CoffeeTicketPaymentScreen extends State<CoffeeTicketPaymentScreen> {
   }
 
   Future<void> getStoreInfo() async {
-    Payment payment = Payment();
-    ProductDetails? product = await payment.getCoffeeTicketItemInfo();
+    ProductDetails? product = await _payment.getCoffeeTicketItemInfo();
     setState(() {
       _product = product;
     });
@@ -217,7 +218,7 @@ class _CoffeeTicketPaymentScreen extends State<CoffeeTicketPaymentScreen> {
                     padding: EdgeInsets.fromLTRB(width * 0.15, height * 0.02, width * 0.15, height * 0.02)
                 ),
                 onPressed: !_flag? null: () {
-                  // TODO サブスクリプション購入処理
+                  _payment.buyCoffeeTicket(_product!); /// コーヒーチケット購入処理
                 },
                 child: Text(
                   "コーヒーチケットを購入する",

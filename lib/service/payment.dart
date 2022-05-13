@@ -3,6 +3,9 @@ import 'dart:async';
 import 'package:cloud_functions/cloud_functions.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:in_app_purchase/in_app_purchase.dart';
+import 'package:motion_customers/service/firestore_customize.dart';
+
+import '../entity/customers.dart';
 
 class Payment {
   Payment() : super() {
@@ -94,8 +97,23 @@ class Payment {
     return null;
   }
 
-  /// 購入を実行する
+  /// 消耗型アイテムを購入する
+  Future<void> buyCoffeeTicket(ProductDetails product) async {
+
+    try {
+      PurchaseParam purchaseParam = PurchaseParam(
+        productDetails: product,
+        applicationUserName: null
+      );
+      await _connection.buyConsumable(purchaseParam: purchaseParam);
+    } catch (err) {
+      // TODO
+    }
+  }
+
+  /// サブスクリプションアイテムを購入する
   Future<void> buySubscription(ProductDetails product) async {
+
     try {
       PurchaseParam purchaseParam = PurchaseParam(
         productDetails: product,
@@ -113,21 +131,23 @@ class Payment {
     // uid取得
     String? uid = FirebaseAuth.instance.currentUser?.uid;
 
-    try {
-      HttpsCallable verifyReceipt =
-      FirebaseFunctions.instanceFor(region: 'asia-northeast1').httpsCallable('VerifyReceipt');
-      final HttpsCallableResult result = await verifyReceipt.call(
-          {
-            'uid': uid,
-            'data': data
-          }
-      );
+    // try {
+    //   HttpsCallable verifyReceipt =
+    //       FirebaseFunctions.instanceFor(region: 'asia-northeast1').httpsCallable('VerifyReceipt');
+    //   final HttpsCallableResult result = await verifyReceipt.call(
+    //       {
+    //         'uid': uid,
+    //         'data': data
+    //       }
+    //   );
+    //
+    //   print("Verify Purchase RESULT: " + result.data.toString());
+    //   return result.data[PaymentConst.result];
+    // } catch (_) {
+    //   return PaymentConst.UNEXPECTED_ERROR;
+    // }
 
-      print("Verify Purchase RESULT: " + result.data.toString());
-      return result.data[PaymentConst.result];
-    } catch (_) {
-      return PaymentConst.UNEXPECTED_ERROR;
-    }
+    return PaymentConst.SUCCESS; // TODO クライアント側の動作確認のためスタブ化
   }
 
   /// 購入処理のリスナー
@@ -141,12 +161,13 @@ class Payment {
 
       // PurchaseStatus.pending
       if (purchaseDetails.status == PurchaseStatus.pending) {
-        showPendingUI(true);
+        print("pending");
       } else {
 
         // PurchaseStatus.error
         if (purchaseDetails.status == PurchaseStatus.error) {
           // TODO
+          print("error");
         }
 
         // PurchaseStatus.purchased
@@ -154,6 +175,19 @@ class Payment {
           final result = await _verifyPurchase(purchaseDetails.verificationData.serverVerificationData);
           if (result == PaymentConst.SUCCESS) {
             // TODO
+
+            // uid取得
+            String? uid = FirebaseAuth.instance.currentUser?.uid;
+            if (purchaseDetails.productID == "motion_coffee_ticket") {
+              Customers customer = await FirestoreCustomize.fetchCustomerInfo(uid!);
+              FirestoreCustomize.updateCoffeeTicketsAmount(uid!, int.parse(customer.coffeeTickets)); /// コーヒーチケット追加
+              print("add coffee tickets");
+            } else if (purchaseDetails.productID == "motion_subscription") {
+              FirestoreCustomize.updatePremiumAccount(uid!); /// サブスクリプション反映
+              print("changed user status");
+            }
+
+            print("success");
           }
         }
 
@@ -162,12 +196,15 @@ class Payment {
           final result = await _verifyPurchase(purchaseDetails.verificationData.serverVerificationData);
           if (result == PaymentConst.SUCCESS) {
             // TODO
+            print("restored");
           }
         }
 
         if (purchaseDetails.pendingCompletePurchase) {
           await _connection.completePurchase(purchaseDetails);
+          print("completed");
         }
+
         showPendingUI(false);
       }
     });
