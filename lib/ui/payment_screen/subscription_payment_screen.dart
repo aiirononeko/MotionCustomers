@@ -18,7 +18,7 @@ class _SubscriptionPaymentScreen extends State<SubscriptionPaymentScreen> {
 
   ProductDetails? _product;
 
-  final url = "https://riverbed-coffee-customer-dev.firebaseapp.com/";
+  final url = "https://motion-dev-d0877.web.app/";
   bool _flag = false;
 
   @override
