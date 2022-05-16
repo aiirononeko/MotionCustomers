@@ -1,5 +1,6 @@
 import * as functions from "firebase-functions";
 import * as admin from "firebase-admin";
+admin.initializeApp();
 
 import axios, { AxiosResponse } from "axios";
 
@@ -13,7 +14,7 @@ const DOCUMENT_NOT_FOUND = 2; // Firestoreにドキュメントなし
 const NO_AUTH = 3; // 認証情報なし
 const INVALID_RECEIPT = 4; // レシート情報が不正です
 const ALREADY_EXIST = 5; // 同じトランザクションが存在している
-const UNEXPECTED_ERROR = 99; // 不明なエラー
+// const UNEXPECTED_ERROR = 99; // 不明なエラー
 
 const PACKAGE_NAME_IOS = "motion.motionCustomers";
 
@@ -30,7 +31,7 @@ export const verifyReceipt = functions.region(REGION).https.onCall(async (data, 
 
   const uid: string = context.auth!.uid;
   const verificationData: string = data["data"];
-  const isConsumable: boolean = data["isComsumable"];
+  const isConsumable: boolean = data["isConsumable"];
 
   const verifiedReceipt = await verifyReceiptIos(verificationData, isConsumable);
 
@@ -40,7 +41,7 @@ export const verifyReceipt = functions.region(REGION).https.onCall(async (data, 
   }
 
   // 同じtransaction_idが存在しないか確認し、購入情報が既に登録済みでないか確認する.
-  const queryId: admin.firestore.DocumentData= await firestore
+  const query = firestore
     .collection("Receipts")
     .doc(uid)
     .collection("Purchased")
@@ -48,7 +49,7 @@ export const verifyReceipt = functions.region(REGION).https.onCall(async (data, 
     .get();
 
   // 購入情報が登録済みの場合はALREADY＿EXIST(5)を返却する.
-  if (!queryId.empty) {
+  if ((await query).exists) {
     return { result: ALREADY_EXIST };
   }
 
@@ -60,17 +61,29 @@ export const verifyReceipt = functions.region(REGION).https.onCall(async (data, 
     .doc(verifiedReceipt["transaction_id"])
     .set(verifiedReceipt);
 
-  functions.logger.info("REGIST LATEST RECEIPT RESULT: " + result);
+  functions.logger.info("REGIST LATEST RECEIPT RESULT: " + result.toString());
 
-  // レシートの有効期限が有効かどうかを確認する.
-  const now: number = Date.now();
-  const expireDate: number = Number(verifiedReceipt["expires_date_ms"]);
-  if (now < expireDate) {
+  if (isConsumable) {
+    // コーヒーチケットの場合、成功のレスポンスを返却する.
     functions.logger.info("----------------- END -----------------")
     return { result: SUCCESS };
   } else {
-    functions.logger.info("----------------- END -----------------")
-    return { result: EXPIRED };
+    // サブスクアイテムの場合、レシートの有効期限が有効かどうかを確認する.
+    const now: number = Date.now();
+    const expireDate: number = Number(verifiedReceipt["expires_date_ms"]);
+    if (now < expireDate) {
+
+      // 有効期限内の場合、定期更新のためレシートとレシートの有効期限をCustomersコレクションに登録する.
+      await firestore.collection("Customers").doc(uid).update({
+        "subscription_receipt": verificationData,
+        "expires_date_ms": verifiedReceipt["expires_date_ms"]
+      });
+
+      functions.logger.info("----------------- END -----------------")
+      return { result: SUCCESS };
+    } else {
+      return { result: EXPIRED };
+    }
   }
 })
 
@@ -88,8 +101,6 @@ export async function verifyReceiptIos(verificationData: string, isConsumable: b
       "exclude-old-transactions": true,
     });
 
-    functions.logger.info("PRODUCTION RESPONSE: " + response);
-
     // 本番用APIから返却された`status`が`21007`の場合、送信されたレシートがサンドボックス環境用と判断する
     if (response.data && response.data["status"] === 21007) {
       response = await axios.post(
@@ -100,17 +111,20 @@ export async function verifyReceiptIos(verificationData: string, isConsumable: b
           "exclude-old-transactions": true,
         }
       );
-
-      functions.logger.info("SANDBOX RESPONSE: " + response);
     }
 
     // レシート検証用APIから返却されたレスポンス内の`status`が`0`であれば検証は成功 https://developer.apple.com/documentation/appstorereceipts/status#possible-values
     const result = response.data;
+
+    functions.logger.info("STATUS CODE: " + result["status"]);
+
     if (result["status"] !== 0) {
       return null;
     }
 
     // レスポンスデータ内の`bundle_id`が自身のパッケージ名と一致しているか確認する
+    functions.logger.info("BUNDLE ID: " + result["receipt"]["bundle_id"]);
+
     if (
       !result["receipt"] ||
       result["receipt"]["bundle_id"] !== PACKAGE_NAME_IOS
@@ -128,3 +142,35 @@ export async function verifyReceiptIos(verificationData: string, isConsumable: b
     return null;
   }
 }
+
+// サブスクリプションが有効かどうかを確認する.
+export const verifyUserStatus = functions.region(REGION).https.onCall(async (_, context) => {
+
+  functions.logger.info("----------------- START -----------------")
+
+  const uid: string = context.auth!.uid;
+  const user = (await firestore.collection("Customers").doc(uid).get()).data(); // User情報取得
+
+  if (user !== undefined) {
+    // レシートの有効期限が有効かどうかを確認する.
+    const now: number = Date.now();
+    const expireDate: number = Number(user["expires_date_ms"]);
+    if (now > expireDate) {
+      // 有効期限が切れている場合、AppStoreにユーザー情報を問い合わせる.
+      const verifiedReceipt = await verifyReceiptIos(user["subscription_receipt"], false);
+      const expireDate: number = Number(verifiedReceipt["expires_date_ms"]);
+      if (now > expireDate) {
+        // 有効期限が切れている場合、ユーザーステータスを変更する.
+        firestore.collection("Customers").doc(uid).update({
+          "isPremium": false
+        });
+        return { result: EXPIRED };
+      }
+    }
+
+    functions.logger.info("----------------- END -----------------")
+    return { result: SUCCESS };
+  } else {
+    return { result: DOCUMENT_NOT_FOUND };
+  } 
+});

@@ -8,6 +8,10 @@ import 'package:motion_customers/service/firestore_customize.dart';
 import '../entity/customers.dart';
 
 class Payment {
+
+  late StreamSubscription<List<PurchaseDetails>> _subscription;
+  final InAppPurchase _connection = InAppPurchase.instance;
+
   Payment() : super() {
 
     // 課金処理を監視する
@@ -18,15 +22,8 @@ class Payment {
     }, onDone: () {
       _subscription.cancel();
     }, onError: (error) {
+      // TODO
     }) as StreamSubscription<List<PurchaseDetails>>;
-  }
-
-  late StreamSubscription<List<PurchaseDetails>> _subscription;
-  final InAppPurchase _connection = InAppPurchase.instance;
-
-  /// ストア情報の初期化を行う
-  Future _initStoreStatus() async {
-    // 省略
   }
 
   /// サブスクアイテムの取得を行う
@@ -126,41 +123,43 @@ class Payment {
   }
 
   /// CloudFunctions経由でレシート検証, 期限検証, (検証成功であれば)Firestoreへレシート登録を行う
-  Future<int> _verifyPurchase(String data) async {
-
-    // uid取得
-    String? uid = FirebaseAuth.instance.currentUser?.uid;
+  Future<int> _verifyPurchase(String data, isConsumable) async {
 
     try {
       HttpsCallable verifyReceipt =
-          FirebaseFunctions.instanceFor(region: 'asia-northeast1').httpsCallable('VerifyReceipt');
+          FirebaseFunctions.instanceFor(region: 'asia-northeast1').httpsCallable('verifyReceipt');
       final HttpsCallableResult result = await verifyReceipt.call(
           {
-            'uid': uid,
-            'data': data
+            'data': data,
+            'isConsumable': isConsumable
           }
       );
 
-      print("Verify Purchase RESULT: " + result.data.toString());
+      print("RESULT CODE: " + result.data["result"].toString());
 
-      if (result.data["code"] == 200) {
-        return PaymentConst.SUCCESS;
-      } else {
-        return PaymentConst.UNEXPECTED_ERROR;
-      }
-    } catch (_) {
+      return result.data["result"];
+    } catch (err) {
+      print(err);
       return PaymentConst.UNEXPECTED_ERROR;
     }
   }
 
   /// 購入処理のリスナー
-  void _listenToPurchaseUpdated(List<PurchaseDetails> purchaseDetailsList) async {
+  Future<void> _listenToPurchaseUpdated(List<PurchaseDetails> purchaseDetailsList) async {
 
     if (purchaseDetailsList.isEmpty) {
       return;
     }
 
     purchaseDetailsList.forEach((PurchaseDetails purchaseDetails) async {
+
+      bool isConsumable = false;
+      // サブスクかコーヒーチケットかを判定
+      if (purchaseDetails.productID == "motion_coffee_ticket") {
+        isConsumable = true;
+      } else if (purchaseDetails.productID == "motion_subscription") {
+        isConsumable = false;
+      }
 
       // PurchaseStatus.pending
       if (purchaseDetails.status == PurchaseStatus.pending) {
@@ -175,14 +174,15 @@ class Payment {
 
         // PurchaseStatus.purchased
         else if (purchaseDetails.status == PurchaseStatus.purchased) {
-          final result = await _verifyPurchase(purchaseDetails.verificationData.serverVerificationData);
+
+          final int result = await _verifyPurchase(purchaseDetails.verificationData.serverVerificationData, isConsumable);
           if (result == PaymentConst.SUCCESS) {
 
             // uid取得
             String? uid = FirebaseAuth.instance.currentUser?.uid;
             if (purchaseDetails.productID == "motion_coffee_ticket") {
               Customers customer = await FirestoreCustomize.fetchCustomerInfo(uid!);
-              FirestoreCustomize.updateCoffeeTicketsAmount(uid!, int.parse(customer.coffeeTickets)); /// コーヒーチケット追加
+              FirestoreCustomize.updateCoffeeTicketsAmount(uid, int.parse(customer.coffeeTickets)); /// コーヒーチケット追加
               print("add coffee tickets");
             } else if (purchaseDetails.productID == "motion_subscription") {
               FirestoreCustomize.updatePremiumAccount(uid!); /// サブスクリプション反映
@@ -195,14 +195,15 @@ class Payment {
 
         // PurchaseStatus.restored
         else if (purchaseDetails.status == PurchaseStatus.restored) {
-          final result = await _verifyPurchase(purchaseDetails.verificationData.serverVerificationData);
+
+          final int result = await _verifyPurchase(purchaseDetails.verificationData.serverVerificationData, isConsumable);
           if (result == PaymentConst.SUCCESS) {
 
             // uid取得
             String? uid = FirebaseAuth.instance.currentUser?.uid;
             if (purchaseDetails.productID == "motion_coffee_ticket") {
               Customers customer = await FirestoreCustomize.fetchCustomerInfo(uid!);
-              FirestoreCustomize.updateCoffeeTicketsAmount(uid!, int.parse(customer.coffeeTickets)); /// コーヒーチケット追加
+              FirestoreCustomize.updateCoffeeTicketsAmount(uid, int.parse(customer.coffeeTickets)); /// コーヒーチケット追加
               print("add coffee tickets");
             } else if (purchaseDetails.productID == "motion_subscription") {
               FirestoreCustomize.updatePremiumAccount(uid!); /// サブスクリプション反映
@@ -215,17 +216,9 @@ class Payment {
 
         if (purchaseDetails.pendingCompletePurchase) {
           await _connection.completePurchase(purchaseDetails);
-          print("completed");
         }
-
-        showPendingUI(false);
       }
     });
-  }
-
-  /// 画面をロックする
-  void showPendingUI(bool pending) {
-    // TODO
   }
 }
 

@@ -49,7 +49,6 @@ class FirestoreCustomize {
         'isPremium': true
       });
     } else {
-      // TODO 後ほどエラーハンドリングを実装
       print('このユーザーはすでにプレミアム会員です');
     }
   }
