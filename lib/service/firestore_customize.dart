@@ -1,5 +1,4 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 
 import '../entity/customers.dart';
 
@@ -7,6 +6,7 @@ class FirestoreCustomize {
 
   static final FirebaseFirestore instance = FirebaseFirestore.instance;
 
+  /// Firestoreからカスタマー情報を取得して返却します.
   static Future<Customers> fetchCustomerInfo(String uid) async {
 
     // Customersコレクションからデータを取得
@@ -21,40 +21,27 @@ class FirestoreCustomize {
     }
   }
 
-  static Future<void> signInAndAddCustomerDocument() async {
-
-    // 匿名ユーザーとしてログイン
-    UserCredential userCredential = await FirebaseAuth.instance.signInAnonymously();
-
-    final snapshot = await instance.collection('Customers').doc(userCredential.user!.uid).get();
-
-    // 該当するドキュメントが存在しない場合
-    if (!snapshot.exists) {
-      // Customersコレクションにデータを書き込み
-      await instance.collection('Customers').doc(userCredential.user!.uid).set({
-        'uid': userCredential.user!.uid,
-        'points': 0,
-        'coffeeTickets': 0,
-        'isPremium': false
-      });
-    }
+  /// Firestoreにカスタマー情報を作成します.
+  static Future<void> createCustomerInfo(String email, String uid) async {
+    // Customersコレクションにデータを書き込み
+    await instance.collection('Customers').doc(uid).set({
+      'uid': uid,
+      'points': 0,
+      'coffeeTickets': 0,
+      'isPremium': false,
+      'email': email,
+    });
   }
 
+  /// Firestoreのカスタマー情報を更新します(サブスクの購入).
   static Future<void> updatePremiumAccount(String uid) async {
-
-    final snapshot = await instance.collection('Customers').doc(uid).get();
-
-    if (!snapshot.data()?['isPremium']) {
-      await instance.collection('Customers').doc(uid).update({
-        'isPremium': true
-      });
-    } else {
-      print('このユーザーはすでにプレミアム会員です');
-    }
+    await instance.collection('Customers').doc(uid).update({
+      'isPremium': true
+    });
   }
 
+  /// Firestoreのカスタマー情報を更新します(コーヒーチケットの購入).
   static Future<void> updateCoffeeTicketsAmount(String uid, int coffeeTickets) async {
-
     await instance.collection('Customers').doc(uid).update({
       'coffeeTickets': coffeeTickets+=10
     });
