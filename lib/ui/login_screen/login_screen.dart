@@ -1,6 +1,5 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:motion_customers/service/firestore_customize.dart';
 import 'package:motion_customers/service/validators.dart';
 import 'package:motion_customers/ui/home_screen/home_screen.dart';
 

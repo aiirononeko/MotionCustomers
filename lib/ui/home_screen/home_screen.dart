@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:motion_customers/service/hex_color.dart';
 import 'package:provider/provider.dart';
 
 import '../../view_model/home_view_model.dart';
@@ -14,31 +15,27 @@ class HomeScreen extends StatelessWidget {
     final double height = MediaQuery.of(context).size.height;
 
     return Scaffold(
-      appBar: PreferredSize(
-        preferredSize: Size.fromHeight(height * 0.15),
-        child: Container(
-            width: double.infinity,
-            padding: EdgeInsets.fromLTRB(0, height * 0.1, 0, height * 0.03),
-            child: SvgPicture.asset("images/MotionLogoMain.svg")
-        ),
-      ),
       body: context.read<HomeViewModel>().currentPage,
       bottomNavigationBar: SizedBox(
         height: height * 0.15,
         child: BottomNavigationBar(
-          items: const <BottomNavigationBarItem> [
+          items: <BottomNavigationBarItem> [
             BottomNavigationBarItem(
-              icon: Icon(Icons.credit_card),
+              icon: SvgPicture.asset('images/id_card.svg'),
               label: '',
             ),
             BottomNavigationBarItem(
-              icon: Icon(Icons.coffee),
+              icon: SvgPicture.asset('images/CoffeeCup.svg'),
+              label: '',
+            ),
+            const BottomNavigationBarItem(
+              icon: Icon(Icons.settings),
               label: '',
             ),
           ],
           currentIndex: context.read<HomeViewModel>().selectIndex,
           onTap: Provider.of<HomeViewModel>(context).setIndex,
-          backgroundColor: Colors.black,
+          backgroundColor: HexColor("DADADA"),
           fixedColor: Colors.yellowAccent,
           unselectedItemColor: Colors.white,
           iconSize: height * 0.04,

@@ -162,13 +162,16 @@ class _CoffeeTicketPaymentScreen extends State<CoffeeTicketPaymentScreen> {
               child: Container(
                   margin: EdgeInsets.fromLTRB(0, height * 0.11, 0, 0),
                   padding: EdgeInsets.fromLTRB(0, height * 0.013, 0, height * 0.013),
-                  color: Colors.black12,
+                  decoration: BoxDecoration(
+                    border: Border.all(color: Colors.black),
+                  ),
                   child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       Container(
                         margin: EdgeInsets.fromLTRB(width * 0.03, 0, 0, 0),
                         child: Text(
-                          "利用規約&プライバシーポリシー",
+                          "利用規約",
                           style: TextStyle(
                             fontWeight: FontWeight.bold,
                             fontSize: height * 0.015,
@@ -189,13 +192,14 @@ class _CoffeeTicketPaymentScreen extends State<CoffeeTicketPaymentScreen> {
               ),
             ),
             Container(
-              padding: EdgeInsets.fromLTRB(0, height * 0.01, 0, 0),
+              padding: EdgeInsets.fromLTRB(0, height * 0.01, width * 0.08, 0),
               child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Checkbox(
                     value: _flag,
                     onChanged: _handleCheckbox,
-                    activeColor: Colors.yellowAccent,
+                    activeColor: Colors.black,
                   ),
                   Text(
                     "利用規約確認の上、同意する",

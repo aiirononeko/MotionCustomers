@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/svg.dart';
 import 'package:motion_customers/ui/payment_screen/subscription_payment_screen.dart';
 
 import 'coffee_ticket_payment_screen.dart';
@@ -21,6 +22,9 @@ class PaymentScreen extends StatelessWidget {
       margin: EdgeInsets.fromLTRB(width * 0.1, height * 0.02, width * 0.1, 0),
       child: Column(
         children: [
+          SizedBox(
+            child: SvgPicture.asset("images/MotionLogoMain.svg")
+          ),
           InkWell(
             onTap: () {
               Navigator.push(context, MaterialPageRoute(

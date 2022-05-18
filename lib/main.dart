@@ -7,6 +7,7 @@ import 'package:motion_customers/ui/first_screen/first_screen.dart';
 import 'package:motion_customers/ui/home_screen/home_screen.dart';
 import 'package:motion_customers/view_model/home_view_model.dart';
 import 'package:motion_customers/view_model/point_card_view_model.dart';
+import 'package:motion_customers/view_model/user_view_model.dart';
 import 'package:provider/provider.dart';
 
 import 'entity/customers.dart';
@@ -39,9 +40,9 @@ void main() async {
   runApp(
     MultiProvider(
       providers: [
-        // ChangeNotifierProvider(create: (_) => FirstScreen()),
         ChangeNotifierProvider(create: (_) => HomeViewModel()),
         ChangeNotifierProvider(create: (_) => PointCardViewModel()),
+        ChangeNotifierProvider(create: (_) => UserViewModel()),
       ],
       child: const MyApp(),
     ),

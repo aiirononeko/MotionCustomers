@@ -46,4 +46,13 @@ class FirestoreCustomize {
       'coffeeTickets': coffeeTickets+=10
     });
   }
+
+
+  /// Firestoreに退会ユーザー情報を登録します.
+  static Future<void> createWithdrawCustomer(String uid) async {
+    // WithdrawCustomersコレクションにデータを書き込み
+    await instance.collection("WithdrawCustomers").doc(uid).set({
+      'uid': uid
+    });
+  }
 }

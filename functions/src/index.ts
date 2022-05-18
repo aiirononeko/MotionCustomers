@@ -174,3 +174,15 @@ export const verifyUserStatus = functions.region(REGION).https.onCall(async (_, 
     return { result: DOCUMENT_NOT_FOUND };
   } 
 });
+
+export const deleteCustomer = functions.region(REGION).firestore.document("WithdrawCustomers/{docId}").onCreate(async (snap, context) => {
+  
+  const deleteDocument = snap.data();
+  const uid = deleteDocument.uid;
+
+  // Authenticationのユーザーを削除する.
+  await admin.auth().deleteUser(uid);
+
+  // Firestoreのカスタマーを削除する.
+  // await firestore.collection("Customers").doc(uid).delete(); // よくわからんけど復旧したい時とか使えるかもだから残しておく
+});
