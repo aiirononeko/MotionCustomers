@@ -23,8 +23,10 @@ class UserScreen extends StatelessWidget {
     return Container(
       margin: EdgeInsets.fromLTRB(width * 0.1, height * 0.02, width * 0.1, 0),
       child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           SizedBox(
+              width: width * 0.6,
               child: SvgPicture.asset("images/MotionLogoMain.svg")
           ),
           Text(

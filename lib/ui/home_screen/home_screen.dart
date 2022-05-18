@@ -17,27 +17,34 @@ class HomeScreen extends StatelessWidget {
     return Scaffold(
       body: context.read<HomeViewModel>().currentPage,
       bottomNavigationBar: SizedBox(
-        height: height * 0.15,
+        height: height * 0.135,
         child: BottomNavigationBar(
           items: <BottomNavigationBarItem> [
             BottomNavigationBarItem(
-              icon: SvgPicture.asset('images/id_card.svg'),
+              icon: Container(
+                padding: EdgeInsets.only(top: height * 0.01),
+                child: context.read<HomeViewModel>().getBottomNavigationBarItems()[0],
+              ),
               label: '',
             ),
             BottomNavigationBarItem(
-              icon: SvgPicture.asset('images/CoffeeCup.svg'),
+              icon: Container(
+                padding: EdgeInsets.only(top: height * 0.01),
+                child: context.read<HomeViewModel>().getBottomNavigationBarItems()[1],
+              ),
               label: '',
             ),
-            const BottomNavigationBarItem(
-              icon: Icon(Icons.settings),
+            BottomNavigationBarItem(
+              icon: Container(
+                padding: EdgeInsets.only(top: height * 0.01),
+                child: context.read<HomeViewModel>().getBottomNavigationBarItems()[2],
+              ),
               label: '',
             ),
           ],
           currentIndex: context.read<HomeViewModel>().selectIndex,
           onTap: Provider.of<HomeViewModel>(context).setIndex,
           backgroundColor: HexColor("DADADA"),
-          fixedColor: Colors.yellowAccent,
-          unselectedItemColor: Colors.white,
           iconSize: height * 0.04,
         ),
       )

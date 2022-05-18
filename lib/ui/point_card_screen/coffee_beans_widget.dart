@@ -164,7 +164,7 @@ class _CoffeeBeansWidgetState extends State<CoffeeBeansWidget> {
               ),
               const SizedBox(
                 height: 50,
-                width: 30
+                width: 25
               )
             ],
           ),
@@ -172,7 +172,7 @@ class _CoffeeBeansWidgetState extends State<CoffeeBeansWidget> {
             children: [
               const SizedBox(
                 height: 50,
-                width: 30
+                width: 25
               ),
               Container(
                 child: myPointList[widget.point][1],
@@ -186,7 +186,7 @@ class _CoffeeBeansWidgetState extends State<CoffeeBeansWidget> {
               ),
               const SizedBox(
                 height: 50,
-                width: 30
+                width: 25
               )
             ],
           ),
@@ -194,7 +194,7 @@ class _CoffeeBeansWidgetState extends State<CoffeeBeansWidget> {
             children: [
               const SizedBox(
                 height: 50,
-                width: 30
+                width: 25
               ),
               Container(
                 child: myPointList[widget.point][3],
@@ -208,7 +208,7 @@ class _CoffeeBeansWidgetState extends State<CoffeeBeansWidget> {
               ),
               const SizedBox(
                 height: 50,
-                width: 30
+                width: 25
               )
             ],
           ),
@@ -216,7 +216,7 @@ class _CoffeeBeansWidgetState extends State<CoffeeBeansWidget> {
             children: [
               const SizedBox(
                 height: 50,
-                width: 30
+                width: 25
               ),
               Container(
                 child: myPointList[widget.point][5],
@@ -230,7 +230,7 @@ class _CoffeeBeansWidgetState extends State<CoffeeBeansWidget> {
               ),
               const SizedBox(
                 height: 50,
-                width: 30
+                width: 25
               )
             ],
           ),
@@ -238,7 +238,7 @@ class _CoffeeBeansWidgetState extends State<CoffeeBeansWidget> {
             children: [
               const SizedBox(
                 height: 50,
-                width: 30
+                width: 25
               ),
               Container(
                 child: myPointList[widget.point][7],
@@ -252,7 +252,7 @@ class _CoffeeBeansWidgetState extends State<CoffeeBeansWidget> {
               ),
               const SizedBox(
                 height: 50,
-                width: 30
+                width: 25
               )
             ],
           ),
@@ -260,7 +260,7 @@ class _CoffeeBeansWidgetState extends State<CoffeeBeansWidget> {
             children: [
               const SizedBox(
                 height: 50,
-                width: 30
+                width: 50
               ),
               SvgPicture.asset('images/CoffeeCup.svg')
             ],

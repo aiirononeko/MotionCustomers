@@ -4,7 +4,7 @@ import 'package:provider/provider.dart';
 import 'package:qr_flutter/qr_flutter.dart';
 
 import '../../view_model/point_card_view_model.dart';
-import '../payment_screen/payment_screen.dart';
+import '../payment_screen/subscription_payment_screen.dart';
 import 'coffee_beans_widget.dart';
 
 class PointCardScreen extends StatelessWidget {
@@ -22,53 +22,45 @@ class PointCardScreen extends StatelessWidget {
     return Column(
       children: [
         Container(
-            width: double.infinity,
-            height: height * 0.3,
-            padding: EdgeInsets.fromLTRB(width * 0.08, height * 0.035, width * 0.08, height * 0.025),
-            margin: EdgeInsets.fromLTRB(width * 0.04, height * 0.025, width * 0.04, height * 0.025),
+            width: width * 0.88,
+            height: height * 0.28,
+            margin: EdgeInsets.only(top: height * 0.1),
             decoration: BoxDecoration(
-              border: Border.all(
-                  color: Colors.black,
-                  width: width * 0.005
-              ),
-              boxShadow: [
-                BoxShadow(
-                  color: context.read<PointCardViewModel>().checkIsPremiumColor(),
-                  spreadRadius: 0.8,
-                  offset: const Offset(6, 8),
-                ),
-              ],
-              borderRadius: BorderRadius.circular(10),
-              gradient: LinearGradient(
-                colors: [
-                  context.read<PointCardViewModel>().checkIsPremiumColor(),
-                  Colors.white
-                ],
-                begin: Alignment.topLeft,
-                end: const Alignment(0.3, 0.8),
-                stops: const [0.08, 0.0],
-              ),
+                color: context.read<PointCardViewModel>().checkIsPremiumCardColor()
             ),
             child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Container(
-                    padding: EdgeInsets.only(bottom: height * 0.025),
-                    child: Row(
-                      children: [
-                        Container(
-                          padding: EdgeInsets.only(right: width * 0.01),
-                          child: context.read<PointCardViewModel>().checkIsPremiumCard(),
-                        ),
-                        Text(
-                          context.read<PointCardViewModel>().checkIsPremiumString(),
-                          style: TextStyle(
-                              fontSize: height * 0.03,
-                              fontWeight: FontWeight.bold
-                          ),
-                        )
-                      ],
-                    )
+                SizedBox(
+                  width: width * 0.6,
+                  height: height * 0.1,
+                  child: context.read<PointCardViewModel>().checkIsPremiumLogo(),
                 ),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    context.read<PointCardViewModel>().checkIsPremiumCard(),
+                    Container(
+                      margin: EdgeInsets.only(left: width * 0.01),
+                      child: Text(
+                        context.read<PointCardViewModel>().checkIsPremiumString(),
+                        style: TextStyle(
+                            fontSize: height * 0.02,
+                            fontWeight: FontWeight.bold,
+                            color: context.read<PointCardViewModel>().checkIsPremiumColor(),
+                        ),
+                      ),
+                    )
+                  ],
+                )
+              ],
+            )
+        ),
+        Container(
+            height: height * 0.205,
+            padding: EdgeInsets.fromLTRB(width * 0.11, height * 0.03, width * 0.11, 0),
+            child: Column(
+              children: [
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
@@ -89,9 +81,9 @@ class PointCardScreen extends StatelessWidget {
                                   ),
                                 ),
                                 Text(
-                                  ' point',
+                                  ' P',
                                   style: TextStyle(
-                                    fontSize: height * 0.02,
+                                    fontSize: height * 0.04,
                                     fontWeight: FontWeight.bold,
                                   ),
                                 )
@@ -131,7 +123,7 @@ class PointCardScreen extends StatelessWidget {
                           .read<PointCardViewModel>()
                           .customer
                           .uid,
-                      size: height * width * 0.0004,
+                      size: height * width * 0.00045,
                     )
                   ],
                 ),
@@ -142,48 +134,22 @@ class PointCardScreen extends StatelessWidget {
         Container(
           padding: EdgeInsets.only(bottom: height * 0.03),
           child: Text(
-            'あと${10 - int.parse(context.read<PointCardViewModel>().customer.points)}pointでコーヒー1杯無料チケットを獲得',
+            '${10 - int.parse(context.read<PointCardViewModel>().customer.points)} more points get you a free ticket.',
             style: TextStyle(
-                fontSize: height * 0.016,
+                fontSize: height * 0.018,
                 fontWeight: FontWeight.bold
             ),
           ),
         ),
-        Divider(
-            color: Colors.black,
-            thickness: height * 0.002
-        ),
         InkWell(
-          onTap: () {
-            Navigator.push(context, MaterialPageRoute(
-                builder: (context) => const PaymentScreen()
-            ));
-          },
-        child: Container(
-          // height: width / height * 100,
-          margin: EdgeInsets.only(left: width * 0.05, top: height * 0.005),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              Text(
-                'プレミアムメンバーになって毎日使える \n'
-                    'コーヒーチケットや得点をゲットしよう',
-                style: TextStyle(
-                    fontSize: height * width * 0.00004,
-                    fontWeight: FontWeight.bold,
-                    decoration: TextDecoration.underline,
-                    decorationColor: Colors.yellowAccent,
-                    decorationThickness: height * 0.003
-                ),
-              ),
-              Icon(
-                Icons.navigate_next,
-                size: height * width * 0.0001,
-              )
-            ],
-          ),
-        )
+            onTap: () {
+              if (!context.read<PointCardViewModel>().customer.isPremium) {
+                Navigator.push(context, MaterialPageRoute(
+                    builder: (context) => const SubscriptionPaymentScreen()
+                ));
+              }
+            },
+            child: context.read<PointCardViewModel>().checkIsPremiumLink(width, height)
         )
       ],
     );
