@@ -29,6 +29,8 @@ class _LoginForm extends State<LoginForm> {
   String _password = "";
   bool _isVisiblePassword = false;
 
+  final String url = "https://riverbedcoffee-brewer-roastery.com/policies/terms-of-service";
+
   void _handleEmail(String email) {
     setState(() {
       _email = email;
@@ -81,7 +83,7 @@ class _LoginForm extends State<LoginForm> {
               onChanged: _handlePassword,
             ),
             ElevatedButton(
-              child: const Text('REGISTER'),
+              child: const Text('LOGIN'),
               onPressed: () async {
                 // 入力値のチェック
                 if (Validator.emailValidate(_email) == null

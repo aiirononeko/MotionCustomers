@@ -162,17 +162,15 @@ class _CoffeeBeansWidgetState extends State<CoffeeBeansWidget> {
               Container(
                 child: myPointList[widget.point][0],
               ),
-              const SizedBox(
-                height: 50,
-                width: 25
+              SizedBox(
+                height: height * 0.06,
               )
             ],
           ),
           Column(
             children: [
-              const SizedBox(
-                height: 50,
-                width: 25
+              SizedBox(
+                height: height * 0.06,
               ),
               Container(
                 child: myPointList[widget.point][1],
@@ -184,17 +182,15 @@ class _CoffeeBeansWidgetState extends State<CoffeeBeansWidget> {
               Container(
                 child: myPointList[widget.point][2],
               ),
-              const SizedBox(
-                height: 50,
-                width: 25
+              SizedBox(
+                height: height * 0.06,
               )
             ],
           ),
           Column(
             children: [
-              const SizedBox(
-                height: 50,
-                width: 25
+              SizedBox(
+                height: height * 0.06,
               ),
               Container(
                 child: myPointList[widget.point][3],
@@ -206,17 +202,15 @@ class _CoffeeBeansWidgetState extends State<CoffeeBeansWidget> {
               Container(
                 child: myPointList[widget.point][4],
               ),
-              const SizedBox(
-                height: 50,
-                width: 25
+              SizedBox(
+                height: height * 0.06,
               )
             ],
           ),
           Column(
             children: [
-              const SizedBox(
-                height: 50,
-                width: 25
+              SizedBox(
+                height: height * 0.06,
               ),
               Container(
                 child: myPointList[widget.point][5],
@@ -228,17 +222,15 @@ class _CoffeeBeansWidgetState extends State<CoffeeBeansWidget> {
               Container(
                 child: myPointList[widget.point][6],
               ),
-              const SizedBox(
-                height: 50,
-                width: 25
+              SizedBox(
+                height: height * 0.06,
               )
             ],
           ),
           Column(
             children: [
-              const SizedBox(
-                height: 50,
-                width: 25
+              SizedBox(
+                height: height * 0.06,
               ),
               Container(
                 child: myPointList[widget.point][7],
@@ -250,9 +242,8 @@ class _CoffeeBeansWidgetState extends State<CoffeeBeansWidget> {
               Container(
                 child: myPointList[widget.point][8],
               ),
-              const SizedBox(
-                height: 50,
-                width: 25
+              SizedBox(
+                height: height * 0.06,
               )
             ],
           ),

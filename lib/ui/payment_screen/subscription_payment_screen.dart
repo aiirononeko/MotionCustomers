@@ -18,7 +18,7 @@ class _SubscriptionPaymentScreen extends State<SubscriptionPaymentScreen> {
 
   ProductDetails? _product;
 
-  final url = "https://motion-dev-d0877.web.app/";
+  final url = "https://riverbedcoffee-brewer-roastery.com/policies/terms-of-service";
   bool _flag = false;
 
   @override

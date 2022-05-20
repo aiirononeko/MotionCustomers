@@ -18,7 +18,7 @@ class _CoffeeTicketPaymentScreen extends State<CoffeeTicketPaymentScreen> {
 
   ProductDetails? _product;
 
-  final url = "https://motion-dev-d0877.web.app/";
+  final url = "https://riverbedcoffee-brewer-roastery.com/policies/terms-of-service";
   bool _flag = false;
 
   @override

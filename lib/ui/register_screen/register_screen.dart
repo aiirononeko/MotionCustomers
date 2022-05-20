@@ -32,6 +32,8 @@ class _RegisterForm extends State<RegisterForm> {
   bool _isVisiblePassword = false;
   bool _isVisibleConfirmPassword = false;
 
+  final String url = "https://riverbedcoffee-brewer-roastery.com/policies/terms-of-service";
+
   void _handleEmail(String email) {
     setState(() {
       _email = email;

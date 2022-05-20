@@ -57,12 +57,14 @@ class PointCardScreen extends StatelessWidget {
             )
         ),
         Container(
-            height: height * 0.205,
-            padding: EdgeInsets.fromLTRB(width * 0.11, height * 0.03, width * 0.11, 0),
+            height: height * 0.15,
+            width: width * 0.8,
+            margin: EdgeInsets.only(top: height * 0.025, bottom: height * 0.015),
             child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     Column(
                         children: [
@@ -118,12 +120,15 @@ class PointCardScreen extends StatelessWidget {
                           ),
                         ]
                     ),
+                    SizedBox(
+                      width: width * 0.1,
+                    ),
                     QrImage(
                       data: context
                           .read<PointCardViewModel>()
                           .customer
                           .uid,
-                      size: height * width * 0.00045,
+                      size: height * 0.15,
                     )
                   ],
                 ),
