@@ -14,7 +14,6 @@ class Payment {
 
   Payment() : super() {
 
-    // 課金処理を監視する
     Stream purchaseUpdated = _connection.purchaseStream;
 
     _subscription = purchaseUpdated.listen((purchaseDetailsList) {
@@ -182,10 +181,10 @@ class Payment {
             String? uid = FirebaseAuth.instance.currentUser?.uid;
             if (purchaseDetails.productID == "motion_coffee_ticket") {
               Customers customer = await FirestoreCustomize.fetchCustomerInfo(uid!);
-              FirestoreCustomize.updateCoffeeTicketsAmount(uid, int.parse(customer.coffeeTickets)); /// コーヒーチケット追加
+              await FirestoreCustomize.updateCoffeeTicketsAmount(uid, int.parse(customer.coffeeTickets)); /// コーヒーチケット追加
               print("add coffee tickets");
             } else if (purchaseDetails.productID == "motion_subscription") {
-              FirestoreCustomize.updatePremiumAccount(uid!); /// サブスクリプション反映
+              await FirestoreCustomize.updatePremiumAccount(uid!); /// サブスクリプション反映
               print("changed user status");
             }
 
@@ -203,10 +202,10 @@ class Payment {
             String? uid = FirebaseAuth.instance.currentUser?.uid;
             if (purchaseDetails.productID == "motion_coffee_ticket") {
               Customers customer = await FirestoreCustomize.fetchCustomerInfo(uid!);
-              FirestoreCustomize.updateCoffeeTicketsAmount(uid, int.parse(customer.coffeeTickets)); /// コーヒーチケット追加
+              await FirestoreCustomize.updateCoffeeTicketsAmount(uid, int.parse(customer.coffeeTickets)); /// コーヒーチケット追加
               print("add coffee tickets");
             } else if (purchaseDetails.productID == "motion_subscription") {
-              FirestoreCustomize.updatePremiumAccount(uid!); /// サブスクリプション反映
+              await FirestoreCustomize.updatePremiumAccount(uid!); /// サブスクリプション反映
               print("changed user status");
             }
 

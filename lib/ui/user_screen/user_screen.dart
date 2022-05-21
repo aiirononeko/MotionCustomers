@@ -21,24 +21,26 @@ class UserScreen extends StatelessWidget {
     final double height = MediaQuery.of(context).size.height;
 
     return Container(
-      margin: EdgeInsets.fromLTRB(width * 0.1, height * 0.02, 0, 0),
+      width: width * 1,
+      margin: EdgeInsets.fromLTRB(0, height * 0.02, 0, 0),
       child: Column(
+        crossAxisAlignment: CrossAxisAlignment.center,
         children: [
           Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              SizedBox(
+              Container(
                   width: width * 0.6,
+                  margin: EdgeInsets.only(right: width * 0.2),
                   child: SvgPicture.asset("images/MotionLogoMain.svg")
-              ),
-              Text(
-                  "ID: ${context.read<UserViewModel>().customer.uid}"
               ),
             ],
           ),
-          Container(
-            height: height * 0.5,
-            margin: EdgeInsets.only(left: width * 0.08),
+          Text(
+              "ID: ${context.read<UserViewModel>().customer.uid}"
+          ),
+          SizedBox(
+            height: height * 0.55,
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.center,
               mainAxisAlignment: MainAxisAlignment.end,

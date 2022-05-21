@@ -43,7 +43,7 @@ class FirestoreCustomize {
   /// Firestoreのカスタマー情報を更新します(コーヒーチケットの購入).
   static Future<void> updateCoffeeTicketsAmount(String uid, int coffeeTickets) async {
     await instance.collection('Customers').doc(uid).update({
-      'coffeeTickets': coffeeTickets+=10
+      'coffeeTickets': coffeeTickets+=11
     });
   }
 
