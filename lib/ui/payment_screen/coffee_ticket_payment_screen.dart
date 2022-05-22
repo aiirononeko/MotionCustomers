@@ -76,7 +76,7 @@ class _CoffeeTicketPaymentScreen extends State<CoffeeTicketPaymentScreen> {
                       "Coffee Ticket",
                       style: TextStyle(
                         fontWeight: FontWeight.bold,
-                        fontSize: height * 0.035,
+                        fontSize: height * 0.03,
                       ),
                     ),
                   ),

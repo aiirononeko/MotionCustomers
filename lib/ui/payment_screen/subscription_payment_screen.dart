@@ -73,17 +73,17 @@ class _SubscriptionPaymentScreen extends State<SubscriptionPaymentScreen> {
                   Container(
                     padding: EdgeInsets.fromLTRB(0, height * 0.01, 0, 0),
                     child: Text(
-                      "Premium Member",
+                      "Premium Member Pass",
                       style: TextStyle(
                         fontWeight: FontWeight.bold,
-                        fontSize: height * 0.035,
+                        fontSize: height * 0.03,
                       ),
                     ),
                   ),
                   Container(
                     padding: EdgeInsets.fromLTRB(0, height * 0.025, 0, 0),
                     child: Text(
-                      "月額${_product?.price}でMotion.のコーヒーが飲み放題のサブスクリプション型コーヒーサービス。",
+                      "月額${_product?.price}のサブスクリプションでMotion.のコーヒーが飲み放題になるプレミアムメンバーパス。",
                       style: TextStyle(
                         fontWeight: FontWeight.bold,
                         fontSize: height * 0.015,

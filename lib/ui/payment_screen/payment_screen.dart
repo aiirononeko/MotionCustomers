@@ -30,47 +30,6 @@ class PaymentScreen extends StatelessWidget {
           InkWell(
             onTap: () {
               Navigator.push(context, MaterialPageRoute(
-                  builder: (context) => const SubscriptionPaymentScreen()
-              ));
-            },
-            child: Container(
-              margin: EdgeInsets.only(bottom: height * 0.015),
-              child: Row(
-                children: [
-                  Text(
-                    'Premium Member',
-                    style: TextStyle(
-                        fontSize: height * width * 0.00008,
-                        fontWeight: FontWeight.bold
-                    ),
-                  ),
-                  Icon(
-                    Icons.navigate_next,
-                    size: height * width * 0.0001,
-                  )
-                ],
-              ),
-            ),
-          ),
-          Container(
-            margin: EdgeInsets.only(bottom: height * 0.02),
-            child: const Text(
-              'プレミアムメンバーになって毎日使えるコーヒーチケットや特典をゲットしよう',
-              style: TextStyle(
-                  fontWeight: FontWeight.bold
-              ),
-            ),
-          ),
-          Container(
-            margin: EdgeInsets.only(bottom: height * 0.02),
-            child: Divider(
-                color: Colors.black,
-                thickness: height * 0.002
-            ),
-          ),
-          InkWell(
-            onTap: () {
-              Navigator.push(context, MaterialPageRoute(
                   builder: (context) => const CoffeeTicketPaymentScreen()
               ));
             },
@@ -81,7 +40,7 @@ class PaymentScreen extends StatelessWidget {
                   Text(
                     'Coffee Ticket',
                     style: TextStyle(
-                        fontSize: height * width * 0.00008,
+                        fontSize: height * width * 0.000075,
                         fontWeight: FontWeight.bold
                     ),
                   ),
@@ -93,12 +52,56 @@ class PaymentScreen extends StatelessWidget {
               ),
             ),
           ),
-          const Text(
-            'コーヒーチケットを購入してキャッシュレスで注文をしよう',
-            style: TextStyle(
-                fontWeight: FontWeight.bold
+          Container(
+            margin: EdgeInsets.only(bottom: height * 0.025),
+            child: const Text(
+              'コーヒーチケットを購入してお得にキャッシュレスで注文しよう',
+              style: TextStyle(
+                  fontWeight: FontWeight.bold
+              ),
             ),
-          )
+          ),
+          Container(
+            margin: EdgeInsets.only(bottom: height * 0.025),
+            child: Divider(
+                color: Colors.black,
+                thickness: height * 0.002
+            ),
+          ),
+          InkWell(
+            onTap: () {
+              Navigator.push(context, MaterialPageRoute(
+                  builder: (context) => const SubscriptionPaymentScreen()
+              ));
+            },
+            child: Container(
+              margin: EdgeInsets.only(bottom: height * 0.015),
+              child: Row(
+                children: [
+                  Text(
+                    'Premium Member Pass',
+                    style: TextStyle(
+                        fontSize: height * width * 0.000075,
+                        fontWeight: FontWeight.bold
+                    ),
+                  ),
+                  Icon(
+                    Icons.navigate_next,
+                    size: height * width * 0.0001,
+                  )
+                ],
+              ),
+            ),
+          ),
+          Container(
+            margin: EdgeInsets.only(bottom: height * 0.025),
+            child: const Text(
+              'プレミアムメンバーのサブスクリプションに登録してさらにお得にキャッシュレスで注文しよう',
+              style: TextStyle(
+                  fontWeight: FontWeight.bold
+              ),
+            ),
+          ),
         ],
       ),
     );
