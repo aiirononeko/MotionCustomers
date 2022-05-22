@@ -67,7 +67,7 @@ class _LoginForm extends State<LoginForm> {
             icon: const Icon(Icons.arrow_back),
           ),
           SizedBox(
-              height: height * 0.4,
+              height: height * 0.42,
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: <Widget>[

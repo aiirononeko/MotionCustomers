@@ -24,7 +24,7 @@ class PointCardScreen extends StatelessWidget {
         Container(
             width: width * 0.88,
             height: height * 0.28,
-            margin: EdgeInsets.only(top: height * 0.1),
+            margin: EdgeInsets.only(top: height * 0.085),
             decoration: BoxDecoration(
                 color: context.read<PointCardViewModel>().checkIsPremiumCardColor()
             ),
@@ -59,7 +59,7 @@ class PointCardScreen extends StatelessWidget {
         Container(
             height: height * 0.15,
             width: width * 0.8,
-            margin: EdgeInsets.only(top: height * 0.025, bottom: height * 0.015),
+            margin: EdgeInsets.only(top: height * 0.035, bottom: height * 0.015),
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [

@@ -40,7 +40,7 @@ class PaymentScreen extends StatelessWidget {
                   Text(
                     'Coffee Ticket',
                     style: TextStyle(
-                        fontSize: height * width * 0.000075,
+                        fontSize: width * 0.06,
                         fontWeight: FontWeight.bold
                     ),
                   ),
@@ -81,7 +81,7 @@ class PaymentScreen extends StatelessWidget {
                   Text(
                     'Premium Member Pass',
                     style: TextStyle(
-                        fontSize: height * width * 0.000075,
+                        fontSize: width * 0.06,
                         fontWeight: FontWeight.bold
                     ),
                   ),

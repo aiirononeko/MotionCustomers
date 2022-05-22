@@ -40,7 +40,7 @@ class UserScreen extends StatelessWidget {
               "ID: ${context.read<UserViewModel>().customer.uid}"
           ),
           SizedBox(
-            height: height * 0.55,
+            height: height * 0.5,
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.center,
               mainAxisAlignment: MainAxisAlignment.end,

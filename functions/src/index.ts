@@ -184,5 +184,6 @@ export const deleteCustomer = functions.region(REGION).firestore.document("Withd
   await admin.auth().deleteUser(uid);
 
   // Firestoreのカスタマーを削除する.
-  // await firestore.collection("Customers").doc(uid).delete(); // よくわからんけど復旧したい時とか使えるかもだから残しておく
+  // よくわからんけど復旧したい時とか使えるかもだから残しておく
+  // await firestore.collection("Customers").doc(uid).delete();
 });
