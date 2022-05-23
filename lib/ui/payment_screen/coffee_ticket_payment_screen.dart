@@ -83,7 +83,7 @@ class _CoffeeTicketPaymentScreen extends State<CoffeeTicketPaymentScreen> {
                   Container(
                     padding: EdgeInsets.fromLTRB(0, height * 0.025, 0, 0),
                     child: Text(
-                      "${_product?.price}で11杯分のスペシャルティコーヒーが飲めるコーヒーチケット。",
+                      "${_product?.price}で11枚分のコーヒーチケットを購入しよう。",
                       style: TextStyle(
                         fontWeight: FontWeight.bold,
                         fontSize: height * 0.015,

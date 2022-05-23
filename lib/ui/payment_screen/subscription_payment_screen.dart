@@ -83,7 +83,7 @@ class _SubscriptionPaymentScreen extends State<SubscriptionPaymentScreen> {
                   Container(
                     padding: EdgeInsets.fromLTRB(0, height * 0.025, 0, 0),
                     child: Text(
-                      "月額${_product?.price}のサブスクリプションでMotion.のコーヒーが飲み放題になるプレミアムメンバーパス。",
+                      "月額${_product?.price}のサブスクリプションに登録してプレミアムメンバーパスを手に入れよう。",
                       style: TextStyle(
                         fontWeight: FontWeight.bold,
                         fontSize: height * 0.015,
