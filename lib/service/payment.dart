@@ -6,27 +6,25 @@ import 'package:stripe_payment/stripe_payment.dart';
 class Payment {
 
   /// 新規カードで決済を実施する
-  Future<StripeTransactionResponse> payViaNewCard(
-      String amount) async {
+  Future<StripeTransactionResponse> payViaNewCard() async {
     initialize();
     // create payment method
     final paymentMethod = await StripePayment.paymentRequestWithCardForm(
       CardFormPaymentRequest(),
     );
-    // StripePayment.createSourceWithParams(options);
-    final paymentIntent = await createPaymentIntent(amount);
+    final paymentIntent = await createPaymentIntent();
     final confirmResult = await confirmPaymentIntent(paymentIntent, paymentMethod);
     return handlePaymentResult(confirmResult);
   }
 
   /// 登録済みのカードで決済を実施する
   Future<StripeTransactionResponse> payViaExistingCard(
-      CreditCard creditCard, String amount) async {
+      CreditCard creditCard) async {
     initialize();
     final paymentMethod = await StripePayment.createPaymentMethod(
       PaymentMethodRequest(card: creditCard),
     );
-    final paymentIntent = await createPaymentIntent(amount);
+    final paymentIntent = await createPaymentIntent();
     final confirmResult = await confirmPaymentIntent(paymentIntent, paymentMethod);
     return handlePaymentResult(confirmResult);
   }
@@ -43,8 +41,7 @@ class Payment {
   }
 
   /// PaymentIntentを作成する
-  Future<dynamic> createPaymentIntent(
-      String amount) async {
+  Future<dynamic> createPaymentIntent() async {
     final paymentEndpoint = Uri.https('api.stripe.com', 'v1/payment_intents');
     const secretKey = 'sk_test_EYDJAJ0f4XC1mzW1NqomIqWk008wAaX3l8';
 
@@ -54,7 +51,7 @@ class Payment {
     };
 
     final body = <String, dynamic>{
-      'amount': amount,
+      'amount': '5000',
       'currency': 'jpy',
       'payment_method_types[]': 'card',
     };
@@ -72,13 +69,18 @@ class Payment {
   /// PaymentIntentを確定する
   Future<PaymentIntentResult> confirmPaymentIntent(
       dynamic paymentIntent, PaymentMethod paymentMethod) async {
-    final confirmResult = await StripePayment.confirmPaymentIntent(
-      PaymentIntent(
-        clientSecret: paymentIntent['client_secret'],
-        paymentMethodId: paymentMethod.id,
-      ),
-    );
-    return confirmResult;
+    try {
+
+      final confirmResult = await StripePayment.confirmPaymentIntent(
+        PaymentIntent(
+          clientSecret: paymentIntent['client_secret'],
+          paymentMethodId: paymentMethod.id,
+        ),
+      );
+      return confirmResult;
+    } catch (_) {
+      return PaymentIntentResult(status: 'failed');
+    }
   }
 
   /// PaymentIntentResultをハンドルする

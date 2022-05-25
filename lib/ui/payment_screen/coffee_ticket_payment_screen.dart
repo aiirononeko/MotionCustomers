@@ -1,8 +1,11 @@
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:motion_customers/service/firestore_service.dart';
+import 'package:motion_customers/service/hex_color.dart';
 import 'package:motion_customers/ui/home_screen/home_screen.dart';
+import 'package:motion_customers/utils/widget_utils.dart';
 import 'package:provider/provider.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -20,8 +23,6 @@ class _CoffeeTicketPaymentScreen extends State<CoffeeTicketPaymentScreen> {
 
   final url = "https://riverbedcoffee-brewer-roastery.com/policies/terms-of-service";
   bool _flag = false;
-
-  final _amount = '5000';
 
   @override
   void initState() {
@@ -119,7 +120,7 @@ class _CoffeeTicketPaymentScreen extends State<CoffeeTicketPaymentScreen> {
                         Container(
                           padding: EdgeInsets.fromLTRB(width * 0.05, 0, 0, 0),
                           child: Text(
-                            "¥500×11杯=¥5500",
+                            "500円×11杯=5500",
                             style: TextStyle(
                               fontWeight: FontWeight.bold,
                               fontSize: height * 0.015,
@@ -138,7 +139,7 @@ class _CoffeeTicketPaymentScreen extends State<CoffeeTicketPaymentScreen> {
                     color: Colors.yellowAccent,
                     alignment: Alignment.center,
                     child: Text(
-                      "¥600お得！",
+                      "500円お得！",
                       style: TextStyle(
                         fontWeight: FontWeight.bold,
                         fontSize: height * 0.015,
@@ -216,11 +217,14 @@ class _CoffeeTicketPaymentScreen extends State<CoffeeTicketPaymentScreen> {
                           padding: EdgeInsets.fromLTRB(width * 0.15, height * 0.02, width * 0.15, height * 0.02)
                       ),
                       onPressed: !_flag? null: () async {
+                        
+                        WidgetUtils().showProgressDialog(context);
+
                         StripeTransactionResponse res =
-                          await Payment().payViaNewCard(_amount); // コーヒーチケット購入処理
+                          await Payment().payViaNewCard(); // コーヒーチケット購入処理
 
                         // 決済が成功した場合
-                        if (res.success) {
+                        if (res.message == "Transaction successful") {
 
                           // コーヒーチケットを増やす
                           FirestoreService().updateCoffeeTicketsAmount(FirebaseAuth.instance.currentUser!.uid);
@@ -230,9 +234,33 @@ class _CoffeeTicketPaymentScreen extends State<CoffeeTicketPaymentScreen> {
                           Navigator.push(context, MaterialPageRoute(
                               builder: (context) => const HomeScreen()
                           ));
+
+                          showDialog(
+                              context: context,
+                              builder: (_) => CupertinoAlertDialog(
+                                content: const Text("コーヒーチケットを購入しました。"),
+                                actions: [
+                                  CupertinoDialogAction(
+                                    child: const Text('OK'),
+                                    onPressed: () {
+                                      Navigator.pop(context);
+                                    },
+                                  )
+                                ],
+                              ));
+
                         } else {
 
-                          print(res.message);
+                          // エラーメッセージを表示
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(
+                              content: Text(
+                                  "何らかの理由で決済に失敗しました。大変お手数ですが、お客様のカード情報をご確認ください。",
+                                  textAlign: TextAlign.center,
+                              ),
+                              duration: Duration(seconds: 5),
+                            )
+                          );
                         }
                       },
                       child: Text(
