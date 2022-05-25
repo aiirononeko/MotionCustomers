@@ -1,7 +1,7 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
-import 'package:motion_customers/service/firestore_customize.dart';
+import 'package:motion_customers/service/firestore_service.dart';
 import 'package:motion_customers/ui/first_screen/first_screen.dart';
 import 'package:provider/provider.dart';
 
@@ -178,7 +178,7 @@ class UserScreen extends StatelessWidget {
 
                                                 // 退会処理
                                                 // UIDをFirestoreに登録(登録をトリガーにCloudFunctionが走る)
-                                                await FirestoreCustomize.createWithdrawCustomer(uid);
+                                                await FirestoreService().createWithdrawCustomer(uid);
 
                                                 // 念の為サインアウト
                                                 if (FirebaseAuth.instance.currentUser != null) {

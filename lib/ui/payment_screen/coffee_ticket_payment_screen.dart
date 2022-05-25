@@ -1,9 +1,13 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
-import 'package:in_app_purchase/in_app_purchase.dart';
+import 'package:motion_customers/service/firestore_service.dart';
+import 'package:motion_customers/ui/home_screen/home_screen.dart';
+import 'package:provider/provider.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../../service/payment.dart';
+import '../../view_model/home_view_model.dart';
 
 class CoffeeTicketPaymentScreen extends StatefulWidget {
   const CoffeeTicketPaymentScreen({Key? key}) : super(key: key);
@@ -14,24 +18,14 @@ class CoffeeTicketPaymentScreen extends StatefulWidget {
 
 class _CoffeeTicketPaymentScreen extends State<CoffeeTicketPaymentScreen> {
 
-  final Payment _payment = Payment();
-
-  ProductDetails? _product;
-
   final url = "https://riverbedcoffee-brewer-roastery.com/policies/terms-of-service";
   bool _flag = false;
+
+  final _amount = '5000';
 
   @override
   void initState() {
     super.initState();
-    getStoreInfo();
-  }
-
-  Future<void> getStoreInfo() async {
-    ProductDetails? product = await _payment.getCoffeeTicketItemInfo();
-    setState(() {
-      _product = product;
-    });
   }
 
   void _handleCheckbox(bool? e) {
@@ -83,7 +77,7 @@ class _CoffeeTicketPaymentScreen extends State<CoffeeTicketPaymentScreen> {
                   Container(
                     padding: EdgeInsets.fromLTRB(0, height * 0.025, 0, 0),
                     child: Text(
-                      "${_product?.price}で11枚分のコーヒーチケットを購入しよう。",
+                      "5000円で11枚分のコーヒーチケットを購入しよう。",
                       style: TextStyle(
                         fontWeight: FontWeight.bold,
                         fontSize: height * 0.015,
@@ -221,8 +215,25 @@ class _CoffeeTicketPaymentScreen extends State<CoffeeTicketPaymentScreen> {
                           primary: Colors.black,
                           padding: EdgeInsets.fromLTRB(width * 0.15, height * 0.02, width * 0.15, height * 0.02)
                       ),
-                      onPressed: !_flag? null: () {
-                        _payment.buyCoffeeTicket(_product!); /// コーヒーチケット購入処理
+                      onPressed: !_flag? null: () async {
+                        StripeTransactionResponse res =
+                          await Payment().payViaNewCard(_amount); // コーヒーチケット購入処理
+
+                        // 決済が成功した場合
+                        if (res.success) {
+
+                          // コーヒーチケットを増やす
+                          FirestoreService().updateCoffeeTicketsAmount(FirebaseAuth.instance.currentUser!.uid);
+
+                          // HomeScreenにルーティング
+                          context.read<HomeViewModel>().setIndex(0);
+                          Navigator.push(context, MaterialPageRoute(
+                              builder: (context) => const HomeScreen()
+                          ));
+                        } else {
+
+                          print(res.message);
+                        }
                       },
                       child: Text(
                         "コーヒーチケットを購入する",

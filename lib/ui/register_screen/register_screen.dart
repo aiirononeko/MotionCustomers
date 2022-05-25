@@ -1,7 +1,7 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
-import 'package:motion_customers/service/firestore_customize.dart';
+import 'package:motion_customers/service/firestore_service.dart';
 import 'package:motion_customers/service/validators.dart';
 import 'package:motion_customers/ui/home_screen/home_screen.dart';
 import 'package:motion_customers/view_model/register_view_model.dart';
@@ -206,7 +206,7 @@ class _RegisterForm extends State<RegisterForm> {
                           await FirebaseAuth.instance.createUserWithEmailAndPassword(email: _email, password: _password);
 
                           // Firestoreに登録
-                          await FirestoreCustomize.createCustomerInfo(_email, credential.user!.uid);
+                          await FirestoreService().createCustomerInfo(_email, credential.user!.uid);
 
                           // Home画面に遷移
                           Navigator.push(context, MaterialPageRoute(

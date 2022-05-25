@@ -52,9 +52,10 @@ dependencies:
 
   # HTTP
   url_launcher: ^6.0.20
+  http: ^0.13.4
 
-  # Purchase
-  in_app_purchase: ^3.0.2
+  # Stripe
+  stripe_payment: ^1.1.4
 
 dev_dependencies:
   flutter_test:

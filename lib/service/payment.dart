@@ -1,233 +1,110 @@
-import 'dart:async';
+import 'dart:convert';
 
-import 'package:cloud_functions/cloud_functions.dart';
-import 'package:firebase_auth/firebase_auth.dart';
-import 'package:in_app_purchase/in_app_purchase.dart';
-import 'package:motion_customers/service/firestore_customize.dart';
-
-import '../entity/customers.dart';
+import 'package:http/http.dart' as http;
+import 'package:stripe_payment/stripe_payment.dart';
 
 class Payment {
 
-  late StreamSubscription<List<PurchaseDetails>> _subscription;
-  final InAppPurchase _connection = InAppPurchase.instance;
-
-  Payment() : super() {
-
-    Stream purchaseUpdated = _connection.purchaseStream;
-
-    _subscription = purchaseUpdated.listen((purchaseDetailsList) {
-      _listenToPurchaseUpdated(purchaseDetailsList);
-    }, onDone: () {
-      _subscription.cancel();
-    }, onError: (error) {
-      // TODO
-    }) as StreamSubscription<List<PurchaseDetails>>;
+  /// 新規カードで決済を実施する
+  Future<StripeTransactionResponse> payViaNewCard(
+      String amount) async {
+    initialize();
+    // create payment method
+    final paymentMethod = await StripePayment.paymentRequestWithCardForm(
+      CardFormPaymentRequest(),
+    );
+    // StripePayment.createSourceWithParams(options);
+    final paymentIntent = await createPaymentIntent(amount);
+    final confirmResult = await confirmPaymentIntent(paymentIntent, paymentMethod);
+    return handlePaymentResult(confirmResult);
   }
 
-  /// サブスクアイテムの取得を行う
-  /// 課金ページを開いた時に実行する
-  Future<ProductDetails?> getSubscriptionItemInfo() async {
-
-    final List<String> _productId = ["motion_subscription"];
-
-    // ストア情報が有効か判断
-    final bool isAvailable = await _connection.isAvailable();
-
-    if (!isAvailable) {
-      return null;
-    }
-
-    // サブスクの商品情報を取得する
-    ProductDetailsResponse productDetailResponse =
-      await _connection.queryProductDetails(_productId.toSet());
-
-    if (productDetailResponse.error != null) {
-      return null;
-    }
-
-    if (productDetailResponse.productDetails.isEmpty) {
-      return null;
-    }
-
-    // 課金プランは1つと仮定した実装です
-    if (productDetailResponse.productDetails.length == 1 &&
-        productDetailResponse.productDetails.first.id == _productId.first) {
-      return productDetailResponse.productDetails.first;
-    }
-
-    return null;
+  /// 登録済みのカードで決済を実施する
+  Future<StripeTransactionResponse> payViaExistingCard(
+      CreditCard creditCard, String amount) async {
+    initialize();
+    final paymentMethod = await StripePayment.createPaymentMethod(
+      PaymentMethodRequest(card: creditCard),
+    );
+    final paymentIntent = await createPaymentIntent(amount);
+    final confirmResult = await confirmPaymentIntent(paymentIntent, paymentMethod);
+    return handlePaymentResult(confirmResult);
   }
 
-  /// コーヒーチケットアイテムの取得を行う
-  /// 課金ページを開いた時に実行する
-  Future<ProductDetails?> getCoffeeTicketItemInfo() async {
-
-    final List<String> _productId = ["motion_coffee_ticket"];
-
-    // ストア情報が有効か判断
-    final bool isAvailable = await _connection.isAvailable();
-
-    if (!isAvailable) {
-      return null;
-    }
-
-    // サブスクの商品情報を取得する
-    ProductDetailsResponse productDetailResponse =
-    await _connection.queryProductDetails(_productId.toSet());
-
-    if (productDetailResponse.error != null) {
-      return null;
-    }
-
-    if (productDetailResponse.productDetails.isEmpty) {
-      return null;
-    }
-
-    // 課金プランは1つと仮定した実装です
-    if (productDetailResponse.productDetails.length == 1 &&
-        productDetailResponse.productDetails.first.id == _productId.first) {
-      return productDetailResponse.productDetails.first;
-    }
-
-    return null;
+  /// Stripe初期化
+  void initialize() {
+    const publishableKey = 'pk_test_JQgxurljfaS5p60NmbkIiSa300jhADkIJd';
+    StripePayment.setOptions(
+      StripeOptions(
+        publishableKey: publishableKey,
+        merchantId: 'Test',
+      ),
+    );
   }
 
-  /// 消耗型アイテムを購入する
-  Future<void> buyCoffeeTicket(ProductDetails product) async {
+  /// PaymentIntentを作成する
+  Future<dynamic> createPaymentIntent(
+      String amount) async {
+    final paymentEndpoint = Uri.https('api.stripe.com', 'v1/payment_intents');
+    const secretKey = 'sk_test_EYDJAJ0f4XC1mzW1NqomIqWk008wAaX3l8';
 
-    try {
-      PurchaseParam purchaseParam = PurchaseParam(
-        productDetails: product,
-        applicationUserName: null
+    final headers = <String, String>{
+      'Authorization': 'Bearer $secretKey',
+      'Content-Type': 'application/x-www-form-urlencoded',
+    };
+
+    final body = <String, dynamic>{
+      'amount': amount,
+      'currency': 'jpy',
+      'payment_method_types[]': 'card',
+    };
+
+    final response = await http.post(
+      paymentEndpoint,
+      headers: headers,
+      body: body,
+    );
+
+    final paymentIntent = jsonDecode(response.body);
+    return paymentIntent;
+  }
+
+  /// PaymentIntentを確定する
+  Future<PaymentIntentResult> confirmPaymentIntent(
+      dynamic paymentIntent, PaymentMethod paymentMethod) async {
+    final confirmResult = await StripePayment.confirmPaymentIntent(
+      PaymentIntent(
+        clientSecret: paymentIntent['client_secret'],
+        paymentMethodId: paymentMethod.id,
+      ),
+    );
+    return confirmResult;
+  }
+
+  /// PaymentIntentResultをハンドルする
+  StripeTransactionResponse handlePaymentResult(
+      PaymentIntentResult confirmResult) {
+    if (confirmResult.status == 'succeeded') {
+      return StripeTransactionResponse(
+        message: 'Transaction successful',
+        success: true,
       );
-      await _connection.buyConsumable(purchaseParam: purchaseParam);
-    } catch (err) {
-      // TODO
-    }
-  }
-
-  /// サブスクリプションアイテムを購入する
-  Future<void> buySubscription(ProductDetails product) async {
-
-    try {
-      PurchaseParam purchaseParam = PurchaseParam(
-        productDetails: product,
-        applicationUserName: null,
+    } else {
+      return StripeTransactionResponse(
+        message: 'Transaction failed',
+        success: true,
       );
-      await _connection.buyNonConsumable(purchaseParam: purchaseParam);
-    } catch (err) {
-      // TODO
     }
-  }
-
-  /// CloudFunctions経由でレシート検証, 期限検証, (検証成功であれば)Firestoreへレシート登録を行う
-  Future<int> _verifyPurchase(String data, isConsumable) async {
-
-    try {
-      HttpsCallable verifyReceipt =
-          FirebaseFunctions.instanceFor(region: 'asia-northeast1').httpsCallable('verifyReceipt');
-      final HttpsCallableResult result = await verifyReceipt.call(
-          {
-            'data': data,
-            'isConsumable': isConsumable
-          }
-      );
-
-      print("RESULT CODE: " + result.data["result"].toString());
-
-      return result.data["result"];
-    } catch (err) {
-      print(err);
-      return PaymentConst.UNEXPECTED_ERROR;
-    }
-  }
-
-  /// 購入処理のリスナー
-  Future<void> _listenToPurchaseUpdated(List<PurchaseDetails> purchaseDetailsList) async {
-
-    if (purchaseDetailsList.isEmpty) {
-      return;
-    }
-
-    purchaseDetailsList.forEach((PurchaseDetails purchaseDetails) async {
-
-      bool isConsumable = false;
-      // サブスクかコーヒーチケットかを判定
-      if (purchaseDetails.productID == "motion_coffee_ticket") {
-        isConsumable = true;
-      } else if (purchaseDetails.productID == "motion_subscription") {
-        isConsumable = false;
-      }
-
-      // PurchaseStatus.pending
-      if (purchaseDetails.status == PurchaseStatus.pending) {
-        print("pending");
-      } else {
-
-        // PurchaseStatus.error
-        if (purchaseDetails.status == PurchaseStatus.error) {
-          // TODO
-          print("error");
-        }
-
-        // PurchaseStatus.purchased
-        else if (purchaseDetails.status == PurchaseStatus.purchased) {
-
-          final int result = await _verifyPurchase(purchaseDetails.verificationData.serverVerificationData, isConsumable);
-          if (result == PaymentConst.SUCCESS) {
-
-            // uid取得
-            String? uid = FirebaseAuth.instance.currentUser?.uid;
-            if (purchaseDetails.productID == "motion_coffee_ticket") {
-              Customers customer = await FirestoreCustomize.fetchCustomerInfo(uid!);
-              await FirestoreCustomize.updateCoffeeTicketsAmount(uid, int.parse(customer.coffeeTickets)); /// コーヒーチケット追加
-              print("add coffee tickets");
-            } else if (purchaseDetails.productID == "motion_subscription") {
-              await FirestoreCustomize.updatePremiumAccount(uid!); /// サブスクリプション反映
-              print("changed user status");
-            }
-
-            print("success");
-          }
-        }
-
-        // PurchaseStatus.restored
-        else if (purchaseDetails.status == PurchaseStatus.restored) {
-
-          final int result = await _verifyPurchase(purchaseDetails.verificationData.serverVerificationData, isConsumable);
-          if (result == PaymentConst.SUCCESS) {
-
-            // uid取得
-            String? uid = FirebaseAuth.instance.currentUser?.uid;
-            if (purchaseDetails.productID == "motion_coffee_ticket") {
-              Customers customer = await FirestoreCustomize.fetchCustomerInfo(uid!);
-              await FirestoreCustomize.updateCoffeeTicketsAmount(uid, int.parse(customer.coffeeTickets)); /// コーヒーチケット追加
-              print("add coffee tickets");
-            } else if (purchaseDetails.productID == "motion_subscription") {
-              await FirestoreCustomize.updatePremiumAccount(uid!); /// サブスクリプション反映
-              print("changed user status");
-            }
-
-            print("restored");
-          }
-        }
-
-        if (purchaseDetails.pendingCompletePurchase) {
-          await _connection.completePurchase(purchaseDetails);
-        }
-      }
-    });
   }
 }
 
-class PaymentConst {
-  static const String result = 'result';
-  static const SUCCESS = 0; // 成功 (期限内)
-  static const EXPIRED = 1; // 期限切れ
-  static const DOCUMENT_NOT_FOUND = 2; // Firestoreにドキュメントなし
-  static const NO_AUTH = 3; // 認証情報なし
-  static const INVALID_RECEIPT = 4; // レシート情報が不正です
-  static const ALREADY_EXIST = 5; // 同じトランザクションが存在している
-  static const UNEXPECTED_ERROR = 99; // 不明なエラー
+/// 決済の結果
+class StripeTransactionResponse {
+  StripeTransactionResponse({
+    required this.message,
+    required this.success,
+  });
+
+  String message;
+  bool success;
 }

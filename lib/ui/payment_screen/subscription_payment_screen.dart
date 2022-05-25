@@ -1,9 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:url_launcher/url_launcher.dart';
-import 'package:in_app_purchase/in_app_purchase.dart';
-
-import '../../service/payment.dart';
 
 class SubscriptionPaymentScreen extends StatefulWidget {
   const SubscriptionPaymentScreen({Key? key}) : super(key: key);
@@ -14,24 +11,12 @@ class SubscriptionPaymentScreen extends StatefulWidget {
 
 class _SubscriptionPaymentScreen extends State<SubscriptionPaymentScreen> {
 
-  final Payment _payment = Payment();
-
-  ProductDetails? _product;
-
   final url = "https://riverbedcoffee-brewer-roastery.com/policies/terms-of-service";
   bool _flag = false;
 
   @override
   void initState() {
     super.initState();
-    getStoreInfo();
-  }
-
-  Future<void> getStoreInfo() async {
-    ProductDetails? product = await _payment.getSubscriptionItemInfo();
-    setState(() {
-      _product = product;
-    });
   }
 
   void _handleCheckbox(bool? e) {
@@ -83,7 +68,7 @@ class _SubscriptionPaymentScreen extends State<SubscriptionPaymentScreen> {
                   Container(
                     padding: EdgeInsets.fromLTRB(0, height * 0.025, 0, 0),
                     child: Text(
-                      "月額${_product?.price}のサブスクリプションに登録してプレミアムメンバーパスを手に入れよう。",
+                      "月額3980円のサブスクリプションに登録してプレミアムメンバーパスを手に入れよう。",
                       style: TextStyle(
                         fontWeight: FontWeight.bold,
                         fontSize: height * 0.015,
@@ -222,7 +207,6 @@ class _SubscriptionPaymentScreen extends State<SubscriptionPaymentScreen> {
                           padding: EdgeInsets.fromLTRB(width * 0.15, height * 0.02, width * 0.15, height * 0.02)
                       ),
                       onPressed: !_flag? null: () {
-                        _payment.buySubscription(_product!); /// サブスクリプション購入
                       },
                       child: Text(
                         "サブスクリプションに登録する",

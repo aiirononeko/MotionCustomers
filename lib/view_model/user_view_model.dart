@@ -2,7 +2,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 
 import '../entity/customers.dart';
-import '../service/firestore_customize.dart';
+import '../service/firestore_service.dart';
 
 class UserViewModel extends ChangeNotifier {
 
@@ -15,7 +15,7 @@ class UserViewModel extends ChangeNotifier {
   String get uid => _uid;
 
   Future<void> init() async {
-    _customer = await FirestoreCustomize.fetchCustomerInfo(_uid);
+    _customer = await FirestoreService().fetchCustomerInfo(_uid);
     notifyListeners();
   }
 }

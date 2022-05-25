@@ -2,12 +2,12 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 
 import '../entity/customers.dart';
 
-class FirestoreCustomize {
+class FirestoreService {
 
-  static final FirebaseFirestore instance = FirebaseFirestore.instance;
+  final FirebaseFirestore instance = FirebaseFirestore.instance;
 
   /// Firestoreからカスタマー情報を取得して返却します.
-  static Future<Customers> fetchCustomerInfo(String uid) async {
+  Future<Customers> fetchCustomerInfo(String uid) async {
 
     // Customersコレクションからデータを取得
     final snapshot = await instance.collection('Customers').doc(uid).get();
@@ -22,7 +22,7 @@ class FirestoreCustomize {
   }
 
   /// Firestoreにカスタマー情報を作成します.
-  static Future<void> createCustomerInfo(String email, String uid) async {
+  Future<void> createCustomerInfo(String email, String uid) async {
     // Customersコレクションにデータを書き込み
     await instance.collection('Customers').doc(uid).set({
       'uid': uid,
@@ -33,23 +33,27 @@ class FirestoreCustomize {
     });
   }
 
-  /// Firestoreのカスタマー情報を更新します(サブスクの購入).
-  static Future<void> updatePremiumAccount(String uid) async {
+  /// Firestoreのカスタマー情報を更新します(サブスクの購入・更新).
+  Future<void> updatePremiumAccount(String uid) async {
+    final data = await instance.collection('Customers').doc(uid).get();
+
     await instance.collection('Customers').doc(uid).update({
-      'isPremium': true
+      'isPremium': !data.data()!["isPremium"]
     });
   }
 
   /// Firestoreのカスタマー情報を更新します(コーヒーチケットの購入).
-  static Future<void> updateCoffeeTicketsAmount(String uid, int coffeeTickets) async {
+  Future<void> updateCoffeeTicketsAmount(String uid) async {
+    final data = await instance.collection('Customers').doc(uid).get();
+
     await instance.collection('Customers').doc(uid).update({
-      'coffeeTickets': coffeeTickets+=11
+      'coffeeTickets': data.data()!["coffeeTickets"]+=11
     });
   }
 
 
   /// Firestoreに退会ユーザー情報を登録します.
-  static Future<void> createWithdrawCustomer(String uid) async {
+  Future<void> createWithdrawCustomer(String uid) async {
     // WithdrawCustomersコレクションにデータを書き込み
     await instance.collection("WithdrawCustomers").doc(uid).set({
       'uid': uid

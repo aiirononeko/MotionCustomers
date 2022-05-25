@@ -40,6 +40,11 @@ class HomeViewModel extends ChangeNotifier {
   List<SvgPicture> get bottomNavigationBarItems2 => _bottomNavigationBarItems2;
   List<SvgPicture> get bottomNavigationBarItems3 => _bottomNavigationBarItems3;
 
+  void setStartPage() {
+    _selectIndex = 0;
+    notifyListeners();
+  }
+
   void setIndex(int index) {
     _selectIndex = index;
     notifyListeners();
