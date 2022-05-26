@@ -68,7 +68,7 @@ class _SubscriptionPaymentScreen extends State<SubscriptionPaymentScreen> {
                   Container(
                     padding: EdgeInsets.fromLTRB(0, height * 0.025, 0, 0),
                     child: Text(
-                      "月額3980円のサブスクリプションに登録してプレミアムメンバーパスを手に入れよう。",
+                      "月額3980円でMotion.のコーヒーが飲み放題のサブスクリプション型コーヒーサービス。",
                       style: TextStyle(
                         fontWeight: FontWeight.bold,
                         fontSize: height * 0.015,
@@ -110,7 +110,7 @@ class _SubscriptionPaymentScreen extends State<SubscriptionPaymentScreen> {
                         Container(
                           padding: EdgeInsets.fromLTRB(width * 0.05, 0, 0, 0),
                           child: Text(
-                            "12日×¥500=¥6000",
+                            "12日×500円=6000円",
                             style: TextStyle(
                               fontWeight: FontWeight.bold,
                               fontSize: height * 0.015,
@@ -129,7 +129,7 @@ class _SubscriptionPaymentScreen extends State<SubscriptionPaymentScreen> {
                     color: Colors.yellowAccent,
                     alignment: Alignment.center,
                     child: Text(
-                      "毎月約¥2000以上もお得！",
+                      "毎月約2000円以上もお得！",
                       style: TextStyle(
                         fontWeight: FontWeight.bold,
                         fontSize: height * 0.015,

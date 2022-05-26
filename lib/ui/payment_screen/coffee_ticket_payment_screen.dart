@@ -3,7 +3,6 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:motion_customers/service/firestore_service.dart';
-import 'package:motion_customers/service/hex_color.dart';
 import 'package:motion_customers/ui/home_screen/home_screen.dart';
 import 'package:motion_customers/utils/widget_utils.dart';
 import 'package:provider/provider.dart';
@@ -258,9 +257,11 @@ class _CoffeeTicketPaymentScreen extends State<CoffeeTicketPaymentScreen> {
                                   "何らかの理由で決済に失敗しました。大変お手数ですが、お客様のカード情報をご確認ください。",
                                   textAlign: TextAlign.center,
                               ),
-                              duration: Duration(seconds: 5),
+                              duration: Duration(seconds: 8),
                             )
                           );
+
+                          Navigator.pop(context);
                         }
                       },
                       child: Text(
