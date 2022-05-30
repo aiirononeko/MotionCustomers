@@ -1,6 +1,11 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:url_launcher/url_launcher.dart';
+
+import '../../service/payment.dart';
+import '../../utils/widget_utils.dart';
 
 class SubscriptionPaymentScreen extends StatefulWidget {
   const SubscriptionPaymentScreen({Key? key}) : super(key: key);
@@ -13,6 +18,7 @@ class _SubscriptionPaymentScreen extends State<SubscriptionPaymentScreen> {
 
   final url = "https://riverbedcoffee-brewer-roastery.com/policies/terms-of-service";
   bool _flag = false;
+  final priceId = "price_1L3IukFnaADmyp9oeuguCRH3";
 
   @override
   void initState() {
@@ -58,7 +64,7 @@ class _SubscriptionPaymentScreen extends State<SubscriptionPaymentScreen> {
                   Container(
                     padding: EdgeInsets.fromLTRB(0, height * 0.01, 0, 0),
                     child: Text(
-                      "Premium Member Pass",
+                      "Premium Member",
                       style: TextStyle(
                         fontWeight: FontWeight.bold,
                         fontSize: height * 0.03,
@@ -68,7 +74,7 @@ class _SubscriptionPaymentScreen extends State<SubscriptionPaymentScreen> {
                   Container(
                     padding: EdgeInsets.fromLTRB(0, height * 0.025, 0, 0),
                     child: Text(
-                      "月額3980円でMotion.のコーヒーが飲み放題のサブスクリプション型コーヒーサービス。",
+                      "月額3980円で800円までのドリンクが飲み放題のサブスクリプション型ドリンクサービス。",
                       style: TextStyle(
                         fontWeight: FontWeight.bold,
                         fontSize: height * 0.015,
@@ -80,7 +86,7 @@ class _SubscriptionPaymentScreen extends State<SubscriptionPaymentScreen> {
                   Container(
                     padding: EdgeInsets.fromLTRB(0, height * 0.06, 0, 0),
                     child: Text(
-                      "週3日1杯のコーヒーを飲む場合...",
+                      "週2日1杯のコーヒーを飲む場合...",
                       style: TextStyle(
                         fontWeight: FontWeight.bold,
                         fontSize: height * 0.015,
@@ -110,7 +116,7 @@ class _SubscriptionPaymentScreen extends State<SubscriptionPaymentScreen> {
                         Container(
                           padding: EdgeInsets.fromLTRB(width * 0.05, 0, 0, 0),
                           child: Text(
-                            "12日×500円=6000円",
+                            "8日×800円=6400円",
                             style: TextStyle(
                               fontWeight: FontWeight.bold,
                               fontSize: height * 0.015,
@@ -206,7 +212,33 @@ class _SubscriptionPaymentScreen extends State<SubscriptionPaymentScreen> {
                           primary: Colors.black,
                           padding: EdgeInsets.fromLTRB(width * 0.15, height * 0.02, width * 0.15, height * 0.02)
                       ),
-                      onPressed: !_flag? null: () {
+                      onPressed: !_flag? null: () async {
+                        // customers/{uid}/checkout_sessionsにDocを作成する
+                        // 上記をトリガーにFunctionが発火してsessionIdを取得する
+                        // sessionIdが取得されたら、リダイレクト先のURLに飛ぶ
+                        // 支払いが完了したら、checkout.session.completed
+                        // 支払いが失敗したら、checkout.session.failed
+                        // 請求期間ごとに支払いが成功すると、invoice.paid
+                        // 請求期間ごとに顧客の支払い方法に問題があると、invoice.payment_failed
+
+                        WidgetUtils().showProgressDialog(context);
+
+                        final docRef = await Payment().createCheckoutSessions(
+                            context, FirebaseAuth.instance.currentUser!.uid, priceId);
+
+                        final snapshot =
+                            FirebaseFirestore.instance.collection('customers').doc(FirebaseAuth.instance.currentUser!.uid).collection('checkout_sessions').doc(docRef.id).snapshots();
+                        snapshot.listen((doc) {
+                          if (doc.data()!['error'] != null) {
+                            print(doc.data()!['error']['message']);
+                          }
+                          if (doc.data()!['sessionId'] != null) {
+                            launchUrl(
+                              Uri.parse(doc.data()!['url'])
+                            );
+                          }
+                        }).onDone(() {
+                        });
                       },
                       child: Text(
                         "サブスクリプションに登録する",

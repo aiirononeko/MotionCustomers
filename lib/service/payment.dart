@@ -1,6 +1,9 @@
 import 'dart:convert';
 
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:http/http.dart' as http;
+import 'package:motion_customers/service/firestore_service.dart';
 import 'package:stripe_payment/stripe_payment.dart';
 
 class Payment {
@@ -97,6 +100,11 @@ class Payment {
         success: true,
       );
     }
+  }
+
+  /// customers/{uid}/checkout_sessionsのDocを作成
+  Future<DocumentReference> createCheckoutSessions(BuildContext context, String uid, String priceId) async {
+    return await FirestoreService().createCheckoutSessions(context, uid, priceId);
   }
 }
 

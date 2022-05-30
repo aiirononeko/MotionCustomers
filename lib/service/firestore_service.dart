@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/material.dart';
 
 import '../entity/customers.dart';
 
@@ -57,6 +58,15 @@ class FirestoreService {
     // WithdrawCustomersコレクションにデータを書き込み
     await instance.collection("WithdrawCustomers").doc(uid).set({
       'uid': uid
+    });
+  }
+
+  /// Firestoreにチェックアウトセッション情報を登録します.
+  Future<DocumentReference> createCheckoutSessions(BuildContext context, String uid, String priceId) async {
+    return await instance.collection('customers').doc(uid).collection('checkout_sessions').add({
+      "price": priceId,
+      "success_url": "https://riverbedcoffee-brewer-roastery.com/policies/terms-of-service",
+      "cancel_url": "https://riverbedcoffee-brewer-roastery.com/policies/terms-of-service",
     });
   }
 }

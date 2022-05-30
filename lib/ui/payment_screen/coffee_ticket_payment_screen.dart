@@ -77,7 +77,7 @@ class _CoffeeTicketPaymentScreen extends State<CoffeeTicketPaymentScreen> {
                   Container(
                     padding: EdgeInsets.fromLTRB(0, height * 0.025, 0, 0),
                     child: Text(
-                      "5000円で11枚分のコーヒーチケットを購入しよう。",
+                      "5000円で、800円までのドリンクと交換できるコーヒーチケット11枚を購入しよう。",
                       style: TextStyle(
                         fontWeight: FontWeight.bold,
                         fontSize: height * 0.015,
@@ -119,7 +119,7 @@ class _CoffeeTicketPaymentScreen extends State<CoffeeTicketPaymentScreen> {
                         Container(
                           padding: EdgeInsets.fromLTRB(width * 0.05, 0, 0, 0),
                           child: Text(
-                            "500円×11杯=5500",
+                            "800円×11杯=8800",
                             style: TextStyle(
                               fontWeight: FontWeight.bold,
                               fontSize: height * 0.015,
@@ -138,7 +138,7 @@ class _CoffeeTicketPaymentScreen extends State<CoffeeTicketPaymentScreen> {
                     color: Colors.yellowAccent,
                     alignment: Alignment.center,
                     child: Text(
-                      "500円お得！",
+                      "3300円お得！",
                       style: TextStyle(
                         fontWeight: FontWeight.bold,
                         fontSize: height * 0.015,
