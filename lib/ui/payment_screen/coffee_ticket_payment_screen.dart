@@ -230,22 +230,17 @@ class _CoffeeTicketPaymentScreen extends State<CoffeeTicketPaymentScreen> {
 
                           // HomeScreenにルーティング
                           context.read<HomeViewModel>().setIndex(0);
-                          Navigator.push(context, MaterialPageRoute(
-                              builder: (context) => const HomeScreen()
-                          ));
+                          Navigator.pushAndRemoveUntil(
+                              context,
+                              MaterialPageRoute(
+                                builder: (BuildContext context) => const HomeScreen(),
+                              ),
+                                  (route) => false);
 
                           showDialog(
                               context: context,
-                              builder: (_) => CupertinoAlertDialog(
-                                content: const Text("コーヒーチケットを購入しました。"),
-                                actions: [
-                                  CupertinoDialogAction(
-                                    child: const Text('OK'),
-                                    onPressed: () {
-                                      Navigator.pop(context);
-                                    },
-                                  )
-                                ],
+                              builder: (_) => const CupertinoAlertDialog(
+                                content: Text("コーヒーチケットを購入しました。"),
                               ));
 
                         } else {

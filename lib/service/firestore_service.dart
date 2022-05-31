@@ -65,8 +65,8 @@ class FirestoreService {
   Future<DocumentReference> createCheckoutSessions(BuildContext context, String uid, String priceId) async {
     return await instance.collection('customers').doc(uid).collection('checkout_sessions').add({
       "price": priceId,
-      "success_url": "https://riverbedcoffee-brewer-roastery.com/policies/terms-of-service",
-      "cancel_url": "https://riverbedcoffee-brewer-roastery.com/policies/terms-of-service",
+      "success_url": "https://motion-dev-d0877.web.app",
+      "cancel_url": "https://motion-dev-d0877.web.app",
     });
   }
 }

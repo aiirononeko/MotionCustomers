@@ -747,6 +747,8 @@ PODS:
   - stripe_payment (1.0.0):
     - Flutter
     - Stripe (~> 19.4.0)
+  - uni_links (0.0.1):
+    - Flutter
   - url_launcher_ios (0.0.1):
     - Flutter
 
@@ -757,6 +759,7 @@ DEPENDENCIES:
   - firebase_core (from `.symlinks/plugins/firebase_core/ios`)
   - Flutter (from `Flutter`)
   - stripe_payment (from `.symlinks/plugins/stripe_payment/ios`)
+  - uni_links (from `.symlinks/plugins/uni_links/ios`)
   - url_launcher_ios (from `.symlinks/plugins/url_launcher_ios/ios`)
 
 SPEC REPOS:
@@ -793,6 +796,8 @@ EXTERNAL SOURCES:
     :path: Flutter
   stripe_payment:
     :path: ".symlinks/plugins/stripe_payment/ios"
+  uni_links:
+    :path: ".symlinks/plugins/uni_links/ios"
   url_launcher_ios:
     :path: ".symlinks/plugins/url_launcher_ios/ios"
 
@@ -821,6 +826,7 @@ SPEC CHECKSUMS:
   PromisesObjC: 99b6f43f9e1044bd87a95a60beff28c2c44ddb72
   Stripe: 5914399ac5878056b985d56b409cb4bb1e7fc7e8
   stripe_payment: 1cbe9c339c21b5ecf01035e80eea351067c67c56
+  uni_links: d97da20c7701486ba192624d99bffaaffcfc298a
   url_launcher_ios: 839c58cdb4279282219f5e248c3321761ff3c4de
 
 PODFILE CHECKSUM: 4e8f8b2be68aeea4c0d5beb6ff1e79fface1d048

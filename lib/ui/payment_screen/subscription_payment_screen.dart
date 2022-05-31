@@ -6,6 +6,7 @@ import 'package:url_launcher/url_launcher.dart';
 
 import '../../service/payment.dart';
 import '../../utils/widget_utils.dart';
+import '../home_screen/home_screen.dart';
 
 class SubscriptionPaymentScreen extends StatefulWidget {
   const SubscriptionPaymentScreen({Key? key}) : super(key: key);
@@ -233,9 +234,17 @@ class _SubscriptionPaymentScreen extends State<SubscriptionPaymentScreen> {
                             print(doc.data()!['error']['message']);
                           }
                           if (doc.data()!['sessionId'] != null) {
+
                             launchUrl(
                               Uri.parse(doc.data()!['url'])
                             );
+
+                            Navigator.pushAndRemoveUntil(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (BuildContext context) => const HomeScreen(),
+                                ),
+                                    (route) => false);
                           }
                         }).onDone(() {
                         });
