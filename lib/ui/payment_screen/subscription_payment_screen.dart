@@ -1,11 +1,15 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:motion_customers/service/firestore_service.dart';
+import 'package:provider/provider.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../../service/payment.dart';
 import '../../utils/widget_utils.dart';
+import '../../view_model/home_view_model.dart';
 import '../home_screen/home_screen.dart';
 
 class SubscriptionPaymentScreen extends StatefulWidget {
@@ -214,40 +218,62 @@ class _SubscriptionPaymentScreen extends State<SubscriptionPaymentScreen> {
                           padding: EdgeInsets.fromLTRB(width * 0.15, height * 0.02, width * 0.15, height * 0.02)
                       ),
                       onPressed: !_flag? null: () async {
-                        // customers/{uid}/checkout_sessionsにDocを作成する
-                        // 上記をトリガーにFunctionが発火してsessionIdを取得する
-                        // sessionIdが取得されたら、リダイレクト先のURLに飛ぶ
-                        // 支払いが完了したら、checkout.session.completed
-                        // 支払いが失敗したら、checkout.session.failed
-                        // 請求期間ごとに支払いが成功すると、invoice.paid
-                        // 請求期間ごとに顧客の支払い方法に問題があると、invoice.payment_failed
 
-                        WidgetUtils().showProgressDialog(context);
+                        final uid = FirebaseAuth.instance.currentUser!.uid;
+                        final customer = await FirestoreService().fetchCustomerInfo(uid);
+                        if (customer.isPremium) {
+                          // プレミアム会員の場合は決済しない
+                          // HomeScreenにルーティング
+                          context.read<HomeViewModel>().setIndex(0);
+                          Navigator.pushAndRemoveUntil(
+                              context,
+                              MaterialPageRoute(
+                                builder: (BuildContext context) => const HomeScreen(),
+                              ),
+                                  (route) => false);
 
-                        final docRef = await Payment().createCheckoutSessions(
-                            context, FirebaseAuth.instance.currentUser!.uid, priceId);
+                          showDialog(
+                              context: context,
+                              builder: (_) => const CupertinoAlertDialog(
+                                content: Text("すでにプレミアム会員です。"),
+                              ));
+                        } else {
+                          // customers/{uid}/checkout_sessionsにDocを作成する
+                          // 上記をトリガーにFunctionが発火してsessionIdを取得する
+                          // sessionIdが取得されたら、Stripeのカスタマーポータルに遷移
+                          WidgetUtils().showProgressDialog(context);
 
-                        final snapshot =
-                            FirebaseFirestore.instance.collection('customers').doc(FirebaseAuth.instance.currentUser!.uid).collection('checkout_sessions').doc(docRef.id).snapshots();
-                        snapshot.listen((doc) {
-                          if (doc.data()!['error'] != null) {
-                            print(doc.data()!['error']['message']);
-                          }
-                          if (doc.data()!['sessionId'] != null) {
+                          final docRef = await Payment().createCheckoutSessions(context, uid, priceId);
 
-                            launchUrl(
-                              Uri.parse(doc.data()!['url'])
-                            );
+                          final snapshot = FirebaseFirestore.instance
+                              .collection('customers')
+                              .doc(uid)
+                              .collection('checkout_sessions')
+                              .doc(docRef.id)
+                              .snapshots();
 
-                            Navigator.pushAndRemoveUntil(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (BuildContext context) => const HomeScreen(),
-                                ),
-                                    (route) => false);
-                          }
-                        }).onDone(() {
-                        });
+                          snapshot.listen((doc) {
+                            if (doc.data()!['error'] != null) {
+                              print(doc.data()!['error']['message']);
+                            }
+                            if (doc.data()!['sessionId'] != null) {
+
+                              launchUrl(
+                                  Uri.parse(doc.data()!['url'])
+                              );
+
+                              // HomeScreenにルーティング
+                              context.read<HomeViewModel>().setIndex(0);
+                              Navigator.pushAndRemoveUntil(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (BuildContext context) => const HomeScreen(),
+                                  ),
+                                      (route) => false);
+                            }
+                          }).onDone(() {
+                          });
+                        }
                       },
                       child: Text(
                         "サブスクリプションに登録する",

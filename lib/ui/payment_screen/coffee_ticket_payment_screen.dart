@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -22,6 +23,7 @@ class _CoffeeTicketPaymentScreen extends State<CoffeeTicketPaymentScreen> {
 
   final url = "https://riverbedcoffee-brewer-roastery.com/policies/terms-of-service";
   bool _flag = false;
+  final priceId = "price_1L4bOqFnaADmyp9oJSf3LEQl";
 
   @override
   void initState() {
@@ -119,7 +121,7 @@ class _CoffeeTicketPaymentScreen extends State<CoffeeTicketPaymentScreen> {
                         Container(
                           padding: EdgeInsets.fromLTRB(width * 0.05, 0, 0, 0),
                           child: Text(
-                            "800円×11杯=8800",
+                            "800円×11杯=8800円",
                             style: TextStyle(
                               fontWeight: FontWeight.bold,
                               fontSize: height * 0.015,
@@ -216,18 +218,11 @@ class _CoffeeTicketPaymentScreen extends State<CoffeeTicketPaymentScreen> {
                           padding: EdgeInsets.fromLTRB(width * 0.15, height * 0.02, width * 0.15, height * 0.02)
                       ),
                       onPressed: !_flag? null: () async {
-                        
-                        WidgetUtils().showProgressDialog(context);
 
-                        StripeTransactionResponse res =
-                          await Payment().payViaNewCard(); // コーヒーチケット購入処理
-
-                        // 決済が成功した場合
-                        if (res.message == "Transaction successful") {
-
-                          // コーヒーチケットを増やす
-                          FirestoreService().updateCoffeeTicketsAmount(FirebaseAuth.instance.currentUser!.uid);
-
+                        final uid = FirebaseAuth.instance.currentUser!.uid;
+                        final customer = await FirestoreService().fetchCustomerInfo(uid);
+                        if (customer.isPremium) {
+                          // プレミアム会員の場合は決済しない
                           // HomeScreenにルーティング
                           context.read<HomeViewModel>().setIndex(0);
                           Navigator.pushAndRemoveUntil(
@@ -240,23 +235,44 @@ class _CoffeeTicketPaymentScreen extends State<CoffeeTicketPaymentScreen> {
                           showDialog(
                               context: context,
                               builder: (_) => const CupertinoAlertDialog(
-                                content: Text("コーヒーチケットを購入しました。"),
+                                content: Text("すでにプレミアム会員です。"),
                               ));
-
                         } else {
+                          // customers/{uid}/checkout_sessionsにDocを作成する
+                          // 上記をトリガーにFunctionが発火してsessionIdを取得する
+                          // sessionIdが取得されたら、Stripeのカスタマーポータルに遷移
+                          WidgetUtils().showProgressDialog(context);
 
-                          // エラーメッセージを表示
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(
-                              content: Text(
-                                  "何らかの理由で決済に失敗しました。大変お手数ですが、お客様のカード情報をご確認ください。",
-                                  textAlign: TextAlign.center,
-                              ),
-                              duration: Duration(seconds: 8),
-                            )
-                          );
+                          final docRef = await Payment().createCheckoutSessions(context, uid, priceId);
 
-                          Navigator.pop(context);
+                          final snapshot = FirebaseFirestore.instance
+                              .collection('customers')
+                              .doc(uid)
+                              .collection('checkout_sessions')
+                              .doc(docRef.id)
+                              .snapshots();
+
+                          snapshot.listen((doc) {
+                            if (doc.data()!['error'] != null) {
+                              print(doc.data()!['error']['message']);
+                            }
+                            if (doc.data()!['sessionId'] != null) {
+
+                              launchUrl(
+                                  Uri.parse(doc.data()!['url'])
+                              );
+
+                              // HomeScreenにルーティング
+                              context.read<HomeViewModel>().setIndex(0);
+                              Navigator.pushAndRemoveUntil(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (BuildContext context) => const HomeScreen(),
+                                  ),
+                                      (route) => false);
+                            }
+                          }).onDone(() {
+                          });
                         }
                       },
                       child: Text(

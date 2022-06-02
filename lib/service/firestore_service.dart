@@ -34,25 +34,6 @@ class FirestoreService {
     });
   }
 
-  /// Firestoreのカスタマー情報を更新します(サブスクの購入・更新).
-  Future<void> updatePremiumAccount(String uid) async {
-    final data = await instance.collection('Customers').doc(uid).get();
-
-    await instance.collection('Customers').doc(uid).update({
-      'isPremium': !data.data()!["isPremium"]
-    });
-  }
-
-  /// Firestoreのカスタマー情報を更新します(コーヒーチケットの購入).
-  Future<void> updateCoffeeTicketsAmount(String uid) async {
-    final data = await instance.collection('Customers').doc(uid).get();
-
-    await instance.collection('Customers').doc(uid).update({
-      'coffeeTickets': data.data()!["coffeeTickets"]+=11
-    });
-  }
-
-
   /// Firestoreに退会ユーザー情報を登録します.
   Future<void> createWithdrawCustomer(String uid) async {
     // WithdrawCustomersコレクションにデータを書き込み
@@ -61,12 +42,22 @@ class FirestoreService {
     });
   }
 
-  /// Firestoreにチェックアウトセッション情報を登録します.
-  Future<DocumentReference> createCheckoutSessions(BuildContext context, String uid, String priceId) async {
+  /// Firestoreにサブスクリプションのチェックアウトセッション情報を登録します.
+  Future<DocumentReference> createCheckoutSessionsForSubscription(BuildContext context, String uid, String priceId) async {
     return await instance.collection('customers').doc(uid).collection('checkout_sessions').add({
       "price": priceId,
       "success_url": "https://motion-dev-d0877.web.app",
       "cancel_url": "https://motion-dev-d0877.web.app",
+    });
+  }
+
+  /// Firestoreにコーヒーチケットのチェックアウトセッション情報を登録します.
+  Future<DocumentReference> createCheckoutSessionsForCoffeeTicket(BuildContext context, String uid, String priceId) async {
+    return await instance.collection('customers').doc(uid).collection('checkout_sessions').add({
+      "price": priceId,
+      "success_url": "https://motion-dev-d0877.web.app",
+      "cancel_url": "https://motion-dev-d0877.web.app",
+      "mode": "payment",
     });
   }
 }

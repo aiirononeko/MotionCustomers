@@ -19,6 +19,8 @@ void main() async {
   // Firebase初期化
   await Firebase.initializeApp();
 
+  // await FirestoreService().doesPremium(FirebaseAuth.instance.currentUser!.uid);
+
   // 認証情報がある場合
   if (FirebaseAuth.instance.currentUser != null) {
 

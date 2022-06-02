@@ -40,7 +40,7 @@ class PaymentScreen extends StatelessWidget {
                   Text(
                     'Coffee Ticket',
                     style: TextStyle(
-                        fontSize: width * 0.06,
+                        fontSize: width * 0.065,
                         fontWeight: FontWeight.bold
                     ),
                   ),
@@ -79,9 +79,9 @@ class PaymentScreen extends StatelessWidget {
               child: Row(
                 children: [
                   Text(
-                    'Premium Member Pass',
+                    'Premium Member',
                     style: TextStyle(
-                        fontSize: width * 0.06,
+                        fontSize: width * 0.065,
                         fontWeight: FontWeight.bold
                     ),
                   ),
@@ -96,7 +96,7 @@ class PaymentScreen extends StatelessWidget {
           Container(
             margin: EdgeInsets.only(bottom: height * 0.025),
             child: const Text(
-              'プレミアムメンバーのサブスクリプションに登録してさらにお得にキャッシュレスで注文しよう',
+              'サブスクリプションに登録してさらにお得にキャッシュレスで注文しよう',
               style: TextStyle(
                   fontWeight: FontWeight.bold
               ),

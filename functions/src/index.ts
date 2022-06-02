@@ -3,10 +3,52 @@ import * as admin from "firebase-admin";
 admin.initializeApp();
 
 import axios, { AxiosResponse } from "axios";
+import Stripe from 'stripe';
 
 const firestore = admin.firestore();
-
 const REGION = "asia-northeast1";
+
+export const helloWorld = functions.region(REGION).https.onRequest( async (request, response) => {
+  functions.logger.info("Hello logs!", {structuredData: true});
+  response.send("Hello from Firebase!");
+});
+
+export const stripeEventWebhook = functions.region(REGION).https.onRequest(async (req, res) => {
+  const event = req.body;
+  const checkoutSession = event.data.object as Stripe.Checkout.Session;
+  const customerId = checkoutSession.customer as string;
+
+  // Get customer's UID from Firestore
+  const customersSnap = await admin.firestore()
+    .collection('customers')
+    .where('stripeId', '==', customerId)
+    .get();
+  if (customersSnap.size !== 1) {
+    res.send('User not found.');
+  }
+  const uid = customersSnap.docs[0].id;
+
+  switch (event.type) {
+    case  'checkout.session.completed': {
+      // Customerの会員情報をプレミアム会員にする
+      firestore.collection("Customers").doc(uid).update({
+        "isPremium": true
+      });
+      res.send('User status changed (basic -> premium).');
+    }
+    case 'invoice.payment_failed': {
+      // Customerの会員情報をベーシック会員にする
+      firestore.collection("Customers").doc(uid).update({
+        "isPremium": false
+      });
+      res.send('User status changed (premium -> basic).');
+    }
+    default: {
+      res.send('Some error occured.');
+    }
+  }
+  res.send('Do nothing.');
+}); 
 
 const SUCCESS = 0; // 成功
 const EXPIRED = 1; // 期限切れ
@@ -186,4 +228,44 @@ export const deleteCustomer = functions.region(REGION).firestore.document("Withd
   // Firestoreのカスタマーを削除する.
   // よくわからんけど復旧したい時とか使えるかもだから残しておく
   // await firestore.collection("Customers").doc(uid).delete();
+});
+
+export const activationCustomer = functions.region(REGION).firestore.document("customers/{userId}/subscriptions/{docId}").onCreate(async (snap, context) => {
+
+  const subscriptionData = snap.data();
+  const uid = context.params.userId;
+
+  if (subscriptionData['status'] == 'active') {
+    await firestore.collection('Customers').doc(uid).update({
+      "isPremium": true
+    })
+  }
+});
+
+export const disActivationCustomer = functions.region(REGION).firestore.document("customers/{userId}/subscriptions/{docId}").onUpdate(async (snap, context) => {
+
+  const subscriptionData = snap.after.data();
+  const uid = context.params.userId;
+  if (subscriptionData['status'] != 'active') {
+    await firestore.collection('Customers').doc(uid).update({
+      "isPremium": false
+    })
+  }
+});
+
+export const addCoffeeTicket = functions.region(REGION).firestore.document("customers/{userId}/payments/{docId}").onCreate(async (snap, context) => {
+
+  const data = snap.data();
+  const uid = context.params.userId;
+
+  if (data['amount'] == '5000') {
+    if (data['status'] == 'succeeded') {
+      const customerData = (await firestore.collection('Customers').doc(uid).get()).data();
+      if (customerData != undefined) {
+        await firestore.collection('Customers').doc(uid).update({
+          "coffeeTickets": customerData['coffeeTickets'] + 11
+        });
+      }
+    }
+  }
 });

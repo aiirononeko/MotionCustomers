@@ -1,11 +1,15 @@
+import 'package:cloud_functions/cloud_functions.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:motion_customers/service/firestore_service.dart';
 import 'package:motion_customers/ui/first_screen/first_screen.dart';
 import 'package:provider/provider.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 import '../../service/hex_color.dart';
+import '../../utils/widget_utils.dart';
 import '../../view_model/user_view_model.dart';
 
 class UserScreen extends StatelessWidget {
@@ -45,6 +49,34 @@ class UserScreen extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.center,
               mainAxisAlignment: MainAxisAlignment.end,
               children: [
+                Container(
+                  margin: EdgeInsets.only(bottom: height * 0.02),
+                  child: InkWell(
+                      onTap: () async {
+
+                        WidgetUtils().showProgressDialog(context);
+
+                        final functions = FirebaseFunctions.instanceFor(app: Firebase.app(), region: 'asia-northeast1');
+                        final callable = functions.httpsCallable('ext-firestore-stripe-payments-createPortalLink');
+                        final results = await callable.call({
+                          "return_url": 'https://motion-dev-d0877.web.app'
+                        });
+
+                        launchUrl(
+                            Uri.parse(results.data['url'])
+                        );
+
+                        Navigator.pop(context);
+
+                      },
+                      child: const Text(
+                        "購入情報",
+                        style: TextStyle(
+                          decoration: TextDecoration.underline,
+                        ),
+                      )
+                  ),
+                ),
                 Container(
                   margin: EdgeInsets.only(bottom: height * 0.02),
                   child: InkWell(
