@@ -3,7 +3,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:motion_customers/service/firestore_service.dart';
 
 class Payment {
-  
+
   /// customers/{uid}/checkout_sessionsのDocを作成
   Future<DocumentReference> createCheckoutSessions(BuildContext context, String uid, String priceId) async {
 

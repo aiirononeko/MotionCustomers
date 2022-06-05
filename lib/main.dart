@@ -19,8 +19,6 @@ void main() async {
   // Firebase初期化
   await Firebase.initializeApp();
 
-  // await FirestoreService().doesPremium(FirebaseAuth.instance.currentUser!.uid);
-
   // 認証情報がある場合
   if (FirebaseAuth.instance.currentUser != null) {
 
@@ -55,7 +53,7 @@ class MyApp extends StatelessWidget {
     if (FirebaseAuth.instance.currentUser == null) {
       return const MaterialApp(
           debugShowCheckedModeBanner: false,
-          home: FirstScreen()
+          home: FirstScreen(),
       );
     } else {
       return const MaterialApp(
