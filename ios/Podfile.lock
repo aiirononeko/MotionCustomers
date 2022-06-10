@@ -602,11 +602,11 @@ PODS:
   - BoringSSL-GRPC/Implementation (0.0.24):
     - BoringSSL-GRPC/Interface (= 0.0.24)
   - BoringSSL-GRPC/Interface (0.0.24)
-  - cloud_firestore (3.1.16):
+  - cloud_firestore (3.1.17):
     - Firebase/Firestore (= 8.15.0)
     - firebase_core
     - Flutter
-  - cloud_functions (3.2.15):
+  - cloud_functions (3.2.16):
     - Firebase/Functions (= 8.15.0)
     - firebase_core
     - Flutter
@@ -621,11 +621,11 @@ PODS:
   - Firebase/Functions (8.15.0):
     - Firebase/CoreOnly
     - FirebaseFunctions (~> 8.15.0)
-  - firebase_auth (3.3.18):
+  - firebase_auth (3.3.19):
     - Firebase/Auth (= 8.15.0)
     - firebase_core
     - Flutter
-  - firebase_core (1.17.0):
+  - firebase_core (1.17.1):
     - Firebase/CoreOnly (= 8.15.0)
     - Flutter
   - FirebaseAuth (8.15.0):
@@ -743,10 +743,6 @@ PODS:
   - nanopb/decode (2.30908.0)
   - nanopb/encode (2.30908.0)
   - PromisesObjC (2.1.0)
-  - Stripe (19.4.1)
-  - stripe_payment (1.0.0):
-    - Flutter
-    - Stripe (~> 19.4.0)
   - uni_links (0.0.1):
     - Flutter
   - url_launcher_ios (0.0.1):
@@ -758,7 +754,6 @@ DEPENDENCIES:
   - firebase_auth (from `.symlinks/plugins/firebase_auth/ios`)
   - firebase_core (from `.symlinks/plugins/firebase_core/ios`)
   - Flutter (from `Flutter`)
-  - stripe_payment (from `.symlinks/plugins/stripe_payment/ios`)
   - uni_links (from `.symlinks/plugins/uni_links/ios`)
   - url_launcher_ios (from `.symlinks/plugins/url_launcher_ios/ios`)
 
@@ -781,7 +776,6 @@ SPEC REPOS:
     - Libuv-gRPC
     - nanopb
     - PromisesObjC
-    - Stripe
 
 EXTERNAL SOURCES:
   cloud_firestore:
@@ -794,8 +788,6 @@ EXTERNAL SOURCES:
     :path: ".symlinks/plugins/firebase_core/ios"
   Flutter:
     :path: Flutter
-  stripe_payment:
-    :path: ".symlinks/plugins/stripe_payment/ios"
   uni_links:
     :path: ".symlinks/plugins/uni_links/ios"
   url_launcher_ios:
@@ -804,11 +796,11 @@ EXTERNAL SOURCES:
 SPEC CHECKSUMS:
   abseil: ebe5b5529fb05d93a8bdb7951607be08b7fa71bc
   BoringSSL-GRPC: 3175b25143e648463a56daeaaa499c6cb86dad33
-  cloud_firestore: c85ca781dc18eed0b05c90973b4b030e6802acc4
-  cloud_functions: f0e2909c31ea1d1da0eb249061a7e21bdc0a6019
+  cloud_firestore: 936969669b510f2affd43583582d7b117c5f08d1
+  cloud_functions: b3e6679f6dab1720599622c9e5b4719690074330
   Firebase: 5f8193dff4b5b7c5d5ef72ae54bb76c08e2b841d
-  firebase_auth: ace975b530600827bd901a9a18584f7cdaf6d160
-  firebase_core: aa1b92020533f5c23955e388c347c58fd64f8627
+  firebase_auth: a6470a6974d42f83117932c913aecb926182f907
+  firebase_core: 318de541b0e61d3f24262982a3f0b54afe72439b
   FirebaseAuth: 3e73bf8abf4fbb40f8b421f361f4cc48ee57388c
   FirebaseCore: 5743c5785c074a794d35f2fff7ecc254a91e08b1
   FirebaseCoreDiagnostics: 92e07a649aeb66352b319d43bdd2ee3942af84cb
@@ -824,11 +816,9 @@ SPEC CHECKSUMS:
   Libuv-gRPC: 55e51798e14ef436ad9bc45d12d43b77b49df378
   nanopb: a0ba3315591a9ae0a16a309ee504766e90db0c96
   PromisesObjC: 99b6f43f9e1044bd87a95a60beff28c2c44ddb72
-  Stripe: 5914399ac5878056b985d56b409cb4bb1e7fc7e8
-  stripe_payment: 1cbe9c339c21b5ecf01035e80eea351067c67c56
   uni_links: d97da20c7701486ba192624d99bffaaffcfc298a
   url_launcher_ios: 839c58cdb4279282219f5e248c3321761ff3c4de
 
-PODFILE CHECKSUM: 4e8f8b2be68aeea4c0d5beb6ff1e79fface1d048
+PODFILE CHECKSUM: aafe91acc616949ddb318b77800a7f51bffa2a4c
 
 COCOAPODS: 1.11.3

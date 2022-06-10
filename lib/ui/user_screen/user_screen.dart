@@ -118,9 +118,12 @@ class UserScreen extends StatelessWidget {
                                       await FirebaseAuth.instance.signOut();
 
                                       // First画面に遷移
-                                      Navigator.push(context, MaterialPageRoute(
-                                          builder: (context) => const FirstScreen()
-                                      ));
+                                      Navigator.pushAndRemoveUntil(
+                                          context,
+                                          MaterialPageRoute(
+                                            builder: (BuildContext context) => const FirstScreen(),
+                                          ),
+                                              (route) => false);
 
                                     } catch (_) {}
                                   },
@@ -218,9 +221,12 @@ class UserScreen extends StatelessWidget {
                                                 }
 
                                                 // First画面に遷移
-                                                Navigator.push(context, MaterialPageRoute(
-                                                    builder: (context) => const FirstScreen()
-                                                ));
+                                                Navigator.pushAndRemoveUntil(
+                                                    context,
+                                                    MaterialPageRoute(
+                                                      builder: (BuildContext context) => const FirstScreen(),
+                                                    ),
+                                                        (route) => false);
 
                                               } catch (_) {}
                                             },
