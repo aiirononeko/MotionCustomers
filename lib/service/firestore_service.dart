@@ -4,12 +4,10 @@ import 'package:flutter/material.dart';
 import '../entity/customers.dart';
 
 class FirestoreService {
-
   final FirebaseFirestore instance = FirebaseFirestore.instance;
 
   /// Firestoreからカスタマー情報を取得して返却します.
   Future<Customers> fetchCustomerInfo(String uid) async {
-
     // Customersコレクションからデータを取得
     final snapshot = await instance.collection('Customers').doc(uid).get();
 
@@ -37,14 +35,17 @@ class FirestoreService {
   /// Firestoreに退会ユーザー情報を登録します.
   Future<void> createWithdrawCustomer(String uid) async {
     // WithdrawCustomersコレクションにデータを書き込み
-    await instance.collection("WithdrawCustomers").doc(uid).set({
-      'uid': uid
-    });
+    await instance.collection("WithdrawCustomers").doc(uid).set({'uid': uid});
   }
 
   /// Firestoreにサブスクリプションのチェックアウトセッション情報を登録します.
-  Future<DocumentReference> createCheckoutSessionsForSubscription(BuildContext context, String uid, String priceId) async {
-    return await instance.collection('customers').doc(uid).collection('checkout_sessions').add({
+  Future<DocumentReference> createCheckoutSessionsForSubscription(
+      BuildContext context, String uid, String priceId) async {
+    return await instance
+        .collection('customers')
+        .doc(uid)
+        .collection('checkout_sessions')
+        .add({
       "price": priceId,
       "success_url": "https://motion-dev-d0877.web.app",
       "cancel_url": "https://motion-dev-d0877.web.app",
@@ -52,12 +53,28 @@ class FirestoreService {
   }
 
   /// Firestoreにコーヒーチケットのチェックアウトセッション情報を登録します.
-  Future<DocumentReference> createCheckoutSessionsForCoffeeTicket(BuildContext context, String uid, String priceId) async {
-    return await instance.collection('customers').doc(uid).collection('checkout_sessions').add({
+  Future<DocumentReference> createCheckoutSessionsForCoffeeTicket(
+      BuildContext context, String uid, String priceId) async {
+    return await instance
+        .collection('customers')
+        .doc(uid)
+        .collection('checkout_sessions')
+        .add({
       "price": priceId,
       "success_url": "https://motion-dev-d0877.web.app",
       "cancel_url": "https://motion-dev-d0877.web.app",
       "mode": "payment",
     });
+  }
+
+  /// Firestoreからproducts情報を取得して返却します.
+  Future<dynamic> fetchProduct(String productId) async {
+    // ProductsコレクションからCoffeeTicketのデータを取得
+    final snapshot = await instance.collection('products').doc(productId).get();
+
+    if (snapshot.exists) {
+      // データがあればエンティティクラスに値を詰めて返却
+      return snapshot.data();
+    }
   }
 }
