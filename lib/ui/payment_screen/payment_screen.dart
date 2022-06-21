@@ -46,7 +46,7 @@ class PaymentScreen extends StatelessWidget {
                   ),
                   Icon(
                     Icons.navigate_next,
-                    size: height * width * 0.0001,
+                    size: width * 0.065,
                   )
                 ],
               ),
@@ -54,10 +54,11 @@ class PaymentScreen extends StatelessWidget {
           ),
           Container(
             margin: EdgeInsets.only(bottom: height * 0.025),
-            child: const Text(
+            child: Text(
               'コーヒーチケットを購入してお得にキャッシュレスで注文しよう',
               style: TextStyle(
-                  fontWeight: FontWeight.bold
+                  fontWeight: FontWeight.bold,
+                  fontSize: width * 0.03,
               ),
             ),
           ),
@@ -87,7 +88,7 @@ class PaymentScreen extends StatelessWidget {
                   ),
                   Icon(
                     Icons.navigate_next,
-                    size: height * width * 0.0001,
+                    size: width * 0.065,
                   )
                 ],
               ),
@@ -95,10 +96,11 @@ class PaymentScreen extends StatelessWidget {
           ),
           Container(
             margin: EdgeInsets.only(bottom: height * 0.025),
-            child: const Text(
+            child: Text(
               'サブスクリプションに登録してさらにお得にキャッシュレスで注文しよう',
               style: TextStyle(
-                  fontWeight: FontWeight.bold
+                  fontWeight: FontWeight.bold,
+                  fontSize: width * 0.03,
               ),
             ),
           ),

@@ -83,7 +83,7 @@ class PointCardViewModel extends ChangeNotifier {
             Text(
               'GO PREMIUM MEMBER',
               style: TextStyle(
-                  fontSize: height * width * 0.000065,
+                  fontSize: width * 0.05,
                   fontWeight: FontWeight.bold,
                   decoration: TextDecoration.underline,
                   decorationColor: HexColor("FAFF00"),
@@ -92,7 +92,7 @@ class PointCardViewModel extends ChangeNotifier {
             ),
             Icon(
               Icons.navigate_next,
-              size: height * width * 0.0001,
+              size: width * 0.065,
             )
           ],
         ),

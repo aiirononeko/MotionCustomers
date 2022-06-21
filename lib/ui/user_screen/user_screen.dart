@@ -41,7 +41,10 @@ class UserScreen extends StatelessWidget {
             ],
           ),
           Text(
-              "ID: ${context.read<UserViewModel>().customer.uid}"
+              "ID: ${context.read<UserViewModel>().customer.uid}",
+              style: TextStyle(
+                fontSize: width * 0.03,
+              ),
           ),
           SizedBox(
             height: height * 0.5,
@@ -69,10 +72,11 @@ class UserScreen extends StatelessWidget {
                         Navigator.pop(context);
 
                       },
-                      child: const Text(
+                      child: Text(
                         "購入情報",
                         style: TextStyle(
                           decoration: TextDecoration.underline,
+                          fontSize: width * 0.03,
                         ),
                       )
                   ),
@@ -133,10 +137,11 @@ class UserScreen extends StatelessWidget {
                           },
                         );
                       },
-                      child: const Text(
+                      child: Text(
                         "ログアウト",
                         style: TextStyle(
                           decoration: TextDecoration.underline,
+                          fontSize: width * 0.03,
                         ),
                       )
                   ),
@@ -242,10 +247,11 @@ class UserScreen extends StatelessWidget {
                         },
                       );
                     },
-                    child: const Text(
+                    child: Text(
                       "退会する",
                       style: TextStyle(
                         decoration: TextDecoration.underline,
+                        fontSize: width * 0.03,
                       ),
                     )
                 ),
